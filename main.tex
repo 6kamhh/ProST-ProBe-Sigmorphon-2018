@@ -1,0 +1,268 @@
+\documentclass[a4paper]{article}
+
+\usepackage[german]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[colorinlistoftodos]{todonotes}
+\usepackage{natbib}
+
+\usepackage{multirow}
+\usepackage{url}
+\usepackage{microtype}
+\usepackage{paralist}
+\usepackage{booktabs}
+\usepackage{covington}
+\usepackage{verbatim}
+\usepackage{amsmath}
+\usepackage{csquotes}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage[skip=4pt]{caption}
+\usepackage{hyperref}
+
+\newcommand{\lang}[1]{\textit{#1}}
+\newcommand{\action}[1]{\texttt{#1}}
+
+\title{Projekt Sprachtechnologie\\Projektbericht}
+
+\author{Fynn Schröder\qquad Matr.Nr\\Marcel Kamlot\qquad Matr.Nr\\Gregor Billing\qquad(6808038)}
+
+\date{20.09.2018}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Toller Kram\todo[inline]{todo}
+\end{abstract}
+
+\section{Einleitung und Aufgabenstellung}
+\label{sec:introduction}
+In diesem Projekt haben sich die Autoren mit Wortflexion, also der Wortbildung durch Anpassung an die grammatische Funktion innerhalb des Satzes befasst. Im Deutschen umfasst dies üblicherweise die Deklination von Substantiven und Adjektiven nach Kasus, Numerus und Genus sowie die Konjugation von Verben.
+Andere Sprachen können jedoch anderen Flexionsparadigma unterliegen, und so wurde von Anfang an darauf geachtet, ein möglichst sprach-neutrales System zu entwerfen das sich unabhängig der tatsächlichen Strukturen auf eine Vielzahl von Beispielsprachen anwenden lässt.
+
+\subsection{SIGMORPHON Shared Task}
+\label{sec:sub:shared_task}
+Die Arbeit entstand als Teil des \textit{CoNLL--SIGMORPHON 2018 Shared Task} von \citet{sigmorphon:st2018}. Er besteht aus zwei Aufgaben.  Für Aufgabe 1 wurden von der SIGMORPHON-Gruppe annotierte Daten in über 100 Sprachen veröffentlicht. Diese folgen dem UniMorph-Annotationsschema \citep{kirov:unimorph2018} und sind jeweils in bis zu drei verschieden großen Mengen \todo{bessere Bezeichnung finden} verfügbar, siehe \autoref{fig:training-volumes}. Sie bestehen pro Beispiel aus je einer Grundform (\textit{Lemma}), der flektierten Form (\textit{Flexion}) sowie den Eigenschaften (\textit{Features}) der flektierten Form; in \autoref{fig:german-declension} sind deutsche Beispiele dargestellt. Aufgabe ist es, bei gegebenen Lemma und Features die Flexion zu generieren.
+
+\begin{table}[htb]
+\centering
+\begin{tabular}{lrr}
+\toprule
+& \multicolumn{2}{c}{\# von Trainingsdaten}\\ \cmidrule{2-3}
+Volumen & max & avg\\
+\midrule
+low & 100 & 99.6\\
+medium & 1.000 & 934.5\\
+high & 10.000 & 8553.6\\
+\bottomrule
+\end{tabular}
+\caption{Anzahl der Trainingsdaten je Volumen}
+\label{fig:training-volumes}
+\end{table}
+
+\begin{table}[htb]
+\centering
+\begin{tabular}{llr}
+\toprule
+Lemma & Flexion & Features\\
+\midrule
+Baumhaus & Baumhäuser & N;ACC;PL\\
+Kanarienvogel & Kanarienvögeln & N;DAT;PL\\
+Milchkuh & Milchkühen & N;DAT;PL\\
+\bottomrule
+\end{tabular}
+\caption{Beispiel-Tupel aus dem Trainingsdatensatz \lang{German}}
+\label{fig:german-declension}
+\end{table}
+
+Das Ziel der Aufgabe ist es, je %unabhängig von der Ursprungssprache \todo{inwiefern unabhängig? Trainiert wird ja auf der gleichen Sprache. M} 
+erst kurz vor Ende der Entwicklungszeit veröffentlichtes Test-Set eine möglichst hohe Accuracy zu erreichen. Wir haben es uns darüber hinaus als Ziel gesetzt, die Levenshtein-Distanz der Ausgabe zu minimieren. Es wurden von uns also zwei verschiedene Metriken angewandt:
+\begin{itemize}
+    \item \textbf{Accuracy} als Standardmaß von korrekten Ausgaben im Verhältnis zu allen Ausgaben des Systems insgesamt
+    \item \textbf{Levenshtein-Distanz} gemäß der klassischen Definition von \citet{levenshtein:binary66} um festzustellen, wie weit eine Ausgabe des Systems vom Goldstandard entfernt liegt. Insbesondere hat eine korrekte Ausgabe des Systems also immer einen Distanz-Wert von $0$
+\end{itemize}
+Ebenso wurde zusammen mit den Trainingsdaten ein Baseline-System ausgeliefert, das als Richtwert dient und von dem wir es uns zum Ziel genommen haben, die Accuracy zu schlagen und besser als die Baseline abzuschneiden.\todo[inline]{doppelt und dreifach gemoppelt imho, Baseline quasi == Richtwert, Accuracy schlagen == besser abschneiden. Besser so etwas wie ''Wir haben es uns zum Ziel genommen, mit unseren Ergebnissen in möglichst vielen Sprachen und möglichst weit über denen des Baseline-Systems zu liegen.''}
+
+Letzten Endes wurden alle Systeme der Teilnehmer nach ihrer Accuracy miteinander verglichen, und wir haben uns dabei mit unserer Abgabe im soliden Mittelfeld positioniert. Insbesondere haben wir unsere Zielsetzung weitestgehend erreicht, und bis auf vereinzelte Ausreißer (die unter \autoref{sec:results} noch diskutiert werden) die Werte der Baseline überboten.
+
+Aufgabe 2 wurde von uns nicht bearbeitet. Sie behandelt Flexion im Kontext: In einem gegebenen Satz muss ein unflektiertes Wort flektiert werden, in einer Variante mit, in der anderen ohne gegebenen Features.
+
+\section{Herangehensweise}
+\label{sec:approach}
+
+Die Flexion als solche unterliegt als morphologischer Prozess den grundlegenden Wortbildungsprozessen mit Affixen\todo{Beleg?}. Wörter in ihrer Grundform werden in Wortstamm und Präfixe, Suffixe, Infixe und Zirkumfixe aufgeteilt, und die einzelnen Bestandteile werden wiederum angepasst. \todo{Tabelle vom Paper rüberholen}\todo[inline]{Nicht so sehr auf Affixe fixieren (also relativieren!), oder belegen, dass das für alle Sprachen gilt, sonst verabschieden wir uns von der Sprach-Unabhängigkeit. M}
+Letztendlich geschieht der Vorgang also auf Zeichen-Ebene, und auch die menschliche Intuition der Sprache funktioniert als zeichenweises Abändern des als Lemma gegebenen Wortes\todo{Beleg?}; es schien uns daher von Beginn an sinnvoll, diese Funktionsweise Zeichen für Zeichen in unserem System umzusetzen.
+
+\begin{figure}[htb]
+\centering
+\begin{tabular}{cc}
+bungas & \texttt{N;INST;PL}\\  \addlinespace
+\multicolumn{2}{c}{$\Downarrow$}\\ \addlinespace
+\multicolumn{2}{c}{bungām}
+\end{tabular}
+\caption{Beispiel einer Flexion in Lettisch, ''Trommel/Trommeln''}
+\label{fig:example-inflection}
+\end{figure}
+
+\subsection{Systeme aus den Vorjahren}
+Der unter \autoref{sec:sub:shared_task} beschriebene Shared Task wurde in einer sehr ähnlichen Form schon in den Vorjahren (2017 und 2016) abgehalten, und nachdem die Veranstalter jedes Jahr dazu aufrufen ein \textit{System Description Paper} zu verfassen standen uns recht viele Vorergebnisse und Überlegungen anderer Teilnehmer zur Verfügung. Wir haben uns nicht nur deswegen Inspiration bei manchen dieser Systeme geholt, um Ideen für unser eigenes Verfahren zu entwickeln.
+
+\subsection{Machine Translation}
+Eine andere maßgebliche Grundidee kam aus dem Bereich der maschinellen Übersetzung. Auch hier sollen - entweder auf Wort- oder auf Zeichenebene - Umwandlungsprozesse stattfinden, die konkreten Regeln unterliegen. Insbesondere wird bei der Übersetzung von Vokabeln zunehmend auf Character Embeddings gesetzt\todo{Beleg erforderlich}, und \citet{cjk-mt:LiuLLN17} gehen sogar noch einen Schritt weiter und untersuchen Eigenschaften von Zeichen auf Pixel-Ebene, um die Ergebnisse der Übersetzung weiter zu verbessern.
+
+\subsection{Unsere Schlussfolgerungen}
+Mit all diesen verschiedenen Möglichkeiten und dem Einfluss von Deutsch als unsere Muttersprache haben wir uns letzten Endes entschieden, ein von \citet{cluzh:MakarovRC17} veröffentlichtes System als Grundlage zu nehmen in ein eigenes Verfahren zu erweitern.
+Hierbei wird zeichenweise über ein Lemma iteriert und in jedem Schritt entschieden, welche Aktion durchgeführt werden muss um ein Eingabewort in ein bestimmtes Ausgabewort zu überführen (Details siehe \autoref{sec:transducer}).
+
+Zusätzlich hielten wir es für sinnvoll, lexikalische Änderungen am Stamm, die aber keine eigenständige morphologische Bedeutung haben, möglichst einfach in unser System einzubetten.
+Im Deutschen kann man dieses Phänomen etwa am Beispiel \textit{das Haus} - \textit{Die H\textbf{ä}user} beobachten.
+
+\section{String-Transducer}
+\label{sec:transducer}
+
+Der Umformungsprozess eines Eingabe-Lemmas in eine Ausgabeform wird in unserem System mittels eines String-Transducers realisiert. Dieser iteriert dabei mit einem Zeiger zeichenweise von links nach rechts über das Eingabewort und wendet eine von fünf Aktionen an, um die Ausgabe zu erzeugen. Zur Verfügung stehen die folgenden Aktionen:
+
+\begin{itemize}
+    \item \action{EMIT} $s$ (für ein beliebiges Symbol $s$): Hängt $s$ an den Ausgabe-String an, unabhängig welches Zeichen der Zeiger gerade liest.
+    \item \action{COPY}: Hängt dasjenige Zeichen an den Output an, auf das der Zeiger im Input gerade zeigt.
+    \item \action{PATCH $x$}: Wende die Patch-Operation $x$ auf das Zeichen des Eingabe-Zeigers an, und hänge das resultierende Zeichen an den Output.
+    \item \action{MOVE}: Inkrementiere den Zeiger um 1 Zeichen, um also weiter über das Eingabewort zu laufen.
+    \item \action{EOW} (end of word): Den Transformationsprozess abschließen und die aktuelle Ausgabe als finalen Rückgabewert kennzeichnen.
+\end{itemize}
+
+Besonders ist hierbei die \action{PATCH}-Aktion, die den zuvor genannten Wandel eines Zeichens im Wortstamm erfassen soll. Die ganze Struktur wird in \autoref{sec:patches} genauer erläutert.
+Außerdem lässt sich auch ohne formalen Beweis schnell erkennen, dass der oben skizzierte Transducer jeden beliebigen Input auf jeden beliebigen Output abbilden kann, indem er nämlich pro Zeichen $o$ im Output-Word einfach $o$ emittiert und dann ein \action{EOW} ausgibt. Natürlich ist diese Herangehensweise sehr naiv und nutzt nicht die Tatsache, dass Lemma und flektierte Form oft einen gemeinsamen Wortstamm beinhalten; daher nutzen wir weitere Verfahren um dieses Verhalten zu optimieren.
+
+\subsection{Alignment}
+\label{sec:alignment}
+Lemma und Vollform werden durch einen Aligner über Füllzeichen so ausgerichtet, dass möglichst viele übereinstimmende Zeichen miteinander aligniert \todo{ist das ein deutsches Wort? Duden sagt Ja} sind. Dadurch ermöglichen wir dem Transducer möglichst viele \action{COPY}-Aktionen, die später eine erhebliche Vereinfachung bei der Anwendung der Flexionsregeln bedeuten.
+
+Der Aligner selbst beruht auf der einfachen Editierdistanz nach \citet{levenshtein:binary66}. Wir haben lediglich eine weitere Bedingung hinzugefügt, die zwei verschiedene Zeichen $a, b$ auch dann mit Kosten $0$ berechnet, wenn ein Patch $p$ existiert, der $a$ in $b$ überführt. Nach Berechnung dieser Kostenfunktion wählen wir dasjenige Alignment, das die geringste Levenshtein-Distanz (zuzüglich unserer \action{PATCH}-Regel) ergibt.
+
+\subsection{Orakel-Algorithmus}
+Um schlussendlich aus einem Alignment zwischen Lemma und flektierter Form auch eine Aktionskette für den Transducer errechnen zu können, nutzen wir einen deterministischen Algorithmus der als statisches Orakel agiert. Eine genaue Darstellung findet sich in Algorithmus~\ref{alg:oracle}
+
+\begin{algorithm}[htb]
+\begin{algorithmic}
+\FORALL{$(c_w, c_t)$ \textbf{in} alignment}
+	\IF{$c_w = \#$}
+    	\STATE $actions$.append(\action{EMIT} $c_t$)
+    \ELSIF{$c_t = \#$}
+    	\STATE $actions$.append(\action{MOVE})
+    \ELSIF{$c_w = c_t$}
+    	\STATE $actions$.append(\action{COPY})
+        \STATE $actions$.append(\action{MOVE})
+    \ELSIF{$patchtable$.contains($c_w, c_t$)}
+    	\STATE $actions$.append(\action{PATCH} $c_w$ to $c_t$)
+        \STATE $actions$.append(\action{MOVE})
+    \ELSIF{$c_w \neq c_t$}
+    	\STATE $actions$.append(\action{EMIT} $c_t$)
+        \STATE $actions$.append(\action{MOVE})
+    \ENDIF
+\ENDFOR
+\STATE $actions$.append(\action{EOW})
+\RETURN{$actions$}
+\end{algorithmic}
+\caption{Deriving oracle actions gold standard from aligned input strings}
+\label{alg:oracle}
+\end{algorithm}
+
+\section{Patches}
+\label{sec:patches}
+
+\section{Erweitern der Trainingsdaten}
+\label{sec:enhancer}
+\subsection{Motivation}
+Als eines der großen Schwierigkeiten der Aufgabe haben wir die geringe Menge der Trainingsdaten, insbesondere in den Volumen \textit{low} und \textit{medium}, angesehen. Daher haben wir uns entschieden, die Möglichkeiten des Erweiterns von Trainingsdaten auszuloten. Eine Vorgabe des Shared Tasks war es, keine externe Quellen zu verwenden. Daher haben wir zusätzliche Daten aus den vorhandenen halluziniert. Die Idee ist dabei, Muster wie Suffix- und Präfix-Änderungen zu erkennen und zu replizieren, sodass das System diese Regelmäßigkeiten stärker lernt als seltenere, unregelmäßige Veränderungen.
+
+Einreichungen zu ähnlichen Shared Tasks der Vorjahre haben bereits Trainingsdaten erweitert, darunter auch die Sieger-Einreichung von 2016, \cite{kann-schutze:2016:SIGMORPHON}. Die Einreichung von \citet{bergmanis:augmenting} nutzte zwei Formen eines Sequence Encoders -- eine nutzte Lemmata und Zielformen als Inputs, die andere zufällige Strings.  Die zusätzlichen Trainingsdaten konnten das Ergebnis insgesamt verbessern\todo{wie? M}. \citet{kann-schutze:2017:K17-20} verwendet mehrere Systeme, darunter ein regelbasiertes System. Das System von \citet{silfverberg-EtAl:2017:K17-20} spaltet die Wörter in Präfix, Stamm und Suffix und generiert neue Wörter mit diesen Affixen. Weitere Arbeiten mit Erweiterung von Trainingsdaten sind \cite{zhou-neubig:2017:K17-20} und \cite{nicolai-EtAl:2017:K17-20}.
+
+\subsection{Grundlegender Erweiterungsprozess}
+Um künstliche Daten für ein Datensatz zu generieren, sortiert unser System die Eingabe-Daten in Gruppen von Flexionen mit denselben Features. Innerhalb jeder Gruppe aligniert und vergleicht es jedes Paar von Lemma und Flexion mit jedem anderen Paar und behält pro Vergleich nur die übereinstimmenden Zeichen an den alignierten Positionen. Das Alignieren erfolgt wie in \autoref{sec:alignment} beschrieben. Die restlichen Zeichen werden gelöscht und nach einem Sprachmodell, das aus dem Datensatz generiert wird, aufgefüllt. Dabei werden die gleichen Zeichen, die im Lemma eingesetzt wurden, auch in der Flexion eingesetzt. Bleiben noch Lücken übrig, werden sie durch weitere Zeichen aus dem Modell aufgefüllt. Das Sprachmodell wird in \autoref{sec:enhancer-example} erläutert.
+
+Das System produziert eine vorgegebene Anzahl an künstlichen Wörtern pro Paar. In unseren Versuchen haben wir herausgefunden, dass mehr als fünf Wörter pro Paar keine Verbesserung für das Endergebnis bringt. Bei den meisten Sprachen hat ein zusätzliches Wort das beste Ergebnis gebracht. Wir haben darüber hinaus eine Bedingung eingebaut, die eine minimale Anzahl an Vorkommnisse des Musters der Übereinstimmung vorgibt, konnten jedoch keine Verbesserung des Ergebnisses durch Vorgabe dieses minimalen Supports feststellen.
+
+\subsection{Sprachmodell-Beispiel}
+\label{sec:enhancer-example}
+
+Aus dem Datensatz, aus dem neue Wörter generiert werden sollen, werden alle möglichen n-Gramme bis zu einer vorgegebenen Länge $n=5$ gezählt. In \autoref{fig:example-enhancer} wird ein Beispiel dargestellt. nachdem \texttt{iomm} eingefügt wurde, bleibt eine weitere Lücke, dargestellt durch \#. Um einen angemessenen Buchstaben zu finden, wird das Wort mit den n-Grammen des Sprachmodells verglichen, beginnend mit dem maximalen $n$, $5$. Die betrachteten Buchstaben werden von links nach rechts durchlaufen. Statt der Lücke können dabei beliebige Buchstaben im Modell stehen. Wird keine Übereinstimmung gefunden, wird $n$ um $1$ reduziert und wieder von links nach rechts gesucht. Dies wird wiederholt, bis ein n-Gramm gefunden wurde. In diesem Fall ist das längste n-Gramm \texttt{?ade}, der entsprechende Auszug aus dem Modell wird gezeigt in \autoref{tab:example-langmodel}. Anhand der Wahrscheinlichkeit der einzelnen Buchstaben statt der Lücke wird der Buchstabe ausgewählt, der das $?$ ersetzen sollen, in diesem Fall \texttt{p}.
+
+\begin{table}
+\centering
+\begin{tabular}{cc}
+\toprule
+\texttt{skap\textbf{ad}} & \texttt{skapp\textbf{ade}}\\  %\addlinespace
+\texttt{\#fix\textbf{ad}} & \texttt{\#\#fix\textbf{ade}}\\ \midrule
+\texttt{\#\#\#\#\textbf{ad}} & \texttt{\#\#\#\#\#\textbf{ade}} \\
+$\Downarrow$ & $\Downarrow$\\
+\texttt{iomm\textbf{ad}} & \texttt{iomm\#\textbf{ade}}\\
+$\Downarrow$ & $\Downarrow$\\
+\texttt{iomm\textbf{ad}} & \texttt{iommp\textbf{ade}}\\
+\bottomrule
+\end{tabular}
+\caption{Ein Beispiel für die Erstellung eines künstlichen Wortes aus \textit{skapad} -- \textit{skapade} (ADJ;DEF), \lang{swedish}, ''erschaffen''}
+\label{fig:example-enhancer}
+\end{table}
+
+\begin{table}
+\centering
+\begin{tabular}{lccc}
+\toprule
+N-Gramm & Buchstabe & Frequenz & p\\ \midrule
+ \texttt{?ad} & r & $433$ & $0.4446$ \\
+ & p & $182$ & $0.1869$\\
+ & t & $107$ & $0.1099$\\ 
+& \ldots & \ldots & \ldots \\ \midrule
+\texttt{?ade} & r & $265$ & $0.5311$\\
+ & p & $91$ & $0.1824$\\
+ & n & $46$ & $0.0922$ \\
+ & \ldots & \ldots & \ldots \\ 
+ \bottomrule
+\end{tabular}
+\caption{Auszug aus dem Sprachmodell aus dem Datensatz \lang{swedish} (low)}
+\label{tab:example-langmodel}
+\end{table}
+
+Theoretisch funktioniert dieses System besser mit größeren Datensätzen, da mehr Muster erkannt werden. Leider bedeutet dies auch, dass für kleinere Datensätze, bei denen es besonders nötig ist, die Qualität der künstlichen Daten geringer ist als für größere, bei denen es weniger nötig ist.
+
+\section{Systemaufbau}
+\label{sec:architecture}
+
+\section{Feinabstimmung und Evaluation}
+\label{sec:tuning_evaluation}
+
+\section{Ergebnisse und Diskussion}
+\label{sec:results}
+
+\section{Schwierigkeiten}
+\label{sec:difficulties}
+
+\section{Was wir gelernt haben}
+\label{sec:takeaway}
+
+\section{Ausblick}
+\label{sec:future_work}
+\subsection{Mögliche Verbesserungen}
+Enhancer:
+\begin{itemize}
+    \item besseres Sprachmodell
+    \item besondere Behandlung von Prä- und Suffixen
+    \item Effizienz steigern (statt von $n=5$ abwärts von $n=0$ aufwärts suchen
+\end{itemize}
+
+\subsection{Weitere Anwendungsmöglichkeiten}
+Weitere Möglichkeiten das System anzuwenden, die man erforschen könnte:\todo{nötig/hilfreich? M}
+\begin{itemize}
+    \item Übersetzung
+    \item Flexion von Sprachen mit sehr geringem Datensatz anhand anderer Sprachen aus derselben Familie
+    \item Anwendung außerhalb der Sprache? Bspw. Chemie? 
+\end{itemize}
+
+\bibliography{bib}
+\bibliographystyle{acl_natbib}
+
+\appendix
+
+\end{document}
