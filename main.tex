@@ -26,7 +26,7 @@
 
 \title{Projekt Sprachtechnologie\\Projektbericht}
 
-\author{Fynn Schröder\qquad Matr.Nr\\Marcel Kamlot\qquad Matr.Nr\\Gregor Billing\qquad(6808038)}
+\author{Fynn Schröder\qquad (7003971)\\Marcel Kamlot\qquad Matr.Nr\\Gregor Billing\qquad(6808038)}
 
 \date{20.09.2018}
 
@@ -40,18 +40,18 @@ Toller Kram\todo[inline]{todo}
 \section{Einleitung und Aufgabenstellung}
 \label{sec:introduction}
 In diesem Projekt haben sich die Autoren mit Wortflexion, also der Wortbildung durch Anpassung an die grammatische Funktion innerhalb des Satzes befasst. Im Deutschen umfasst dies üblicherweise die Deklination von Substantiven und Adjektiven nach Kasus, Numerus und Genus sowie die Konjugation von Verben.
-Andere Sprachen können jedoch anderen Flexionsparadigma unterliegen, und so wurde von Anfang an darauf geachtet, ein möglichst sprach-neutrales System zu entwerfen das sich unabhängig der tatsächlichen Strukturen auf eine Vielzahl von Beispielsprachen anwenden lässt.
+Andere Sprachen können jedoch anderen Flexionsparadigma unterliegen, und so wurde von Anfang an darauf geachtet, ein möglichst sprach-neutrales System zu entwerfen, das sich unabhängig der tatsächlichen Strukturen auf eine Vielzahl von Beispielsprachen anwenden lässt.
 
 \subsection{SIGMORPHON Shared Task}
 \label{sec:sub:shared_task}
-Die Arbeit entstand als Teil des \textit{CoNLL--SIGMORPHON 2018 Shared Task} von \citet{sigmorphon:st2018}. Er besteht aus zwei Aufgaben.  Für Aufgabe 1 wurden von der SIGMORPHON-Gruppe annotierte Daten in über 100 Sprachen veröffentlicht. Diese folgen dem UniMorph-Annotationsschema \citep{kirov:unimorph2018} und sind jeweils in bis zu drei verschieden großen Mengen \todo{bessere Bezeichnung finden} verfügbar, siehe \autoref{fig:training-volumes}. Sie bestehen pro Beispiel aus je einer Grundform (\textit{Lemma}), der flektierten Form (\textit{Flexion}) sowie den Eigenschaften (\textit{Features}) der flektierten Form; in \autoref{fig:german-declension} sind deutsche Beispiele dargestellt. Aufgabe ist es, bei gegebenen Lemma und Features die Flexion zu generieren.
+Die Arbeit entstand als Teil des \textit{CoNLL--SIGMORPHON 2018 Shared Task} von \citet{sigmorphon:st2018}. Er besteht aus zwei Aufgaben.  Für Aufgabe 1 wurden von der SIGMORPHON-Gruppe annotierte Daten in über 100 Sprachen veröffentlicht. Diese folgen dem UniMorph-Annotationsschema \citep{kirov:unimorph2018} und sind jeweils in bis zu drei verschieden großen Mengen \todo{bessere Bezeichnung finden} verfügbar, siehe \autoref{fig:training-volumes}. Sie bestehen pro Beispiel aus je einer Grundform (\textit{Lemma}), der flektierten Form (\textit{Flexion}) sowie den Eigenschaften (\textit{Features}) der flektierten Form; in \autoref{fig:german-declension} sind deutsche Beispiele dargestellt. Aufgabe ist es aus gegebenen Lemma und Features die Flexion zu generieren.
 
 \begin{table}[htb]
 \centering
 \begin{tabular}{lrr}
 \toprule
-& \multicolumn{2}{c}{\# von Trainingsdaten}\\ \cmidrule{2-3}
-Volumen & max & avg\\
+& \multicolumn{2}{c}{Anzahl von Trainingsexemplaren}\\ \cmidrule{2-3}
+Volumen & Maximum & Durchschnitt\\
 \midrule
 low & 100 & 99.6\\
 medium & 1.000 & 934.5\\
@@ -117,32 +117,32 @@ Mit all diesen verschiedenen Möglichkeiten und dem Einfluss von Deutsch als uns
 Hierbei wird zeichenweise über ein Lemma iteriert und in jedem Schritt entschieden, welche Aktion durchgeführt werden muss um ein Eingabewort in ein bestimmtes Ausgabewort zu überführen (Details siehe \autoref{sec:transducer}).
 
 Zusätzlich hielten wir es für sinnvoll, lexikalische Änderungen am Stamm, die aber keine eigenständige morphologische Bedeutung haben, möglichst einfach in unser System einzubetten.
-Im Deutschen kann man dieses Phänomen etwa am Beispiel \textit{das Haus} - \textit{Die H\textbf{ä}user} beobachten.
+Im Deutschen kann man dieses Phänomen etwa am Beispiel \textit{das Haus} - \textit{die H\textbf{ä}user} beobachten.
 
-\section{String-Transducer}
+\section{String-Transduktor}
 \label{sec:transducer}
 
-Der Umformungsprozess eines Eingabe-Lemmas in eine Ausgabeform wird in unserem System mittels eines String-Transducers realisiert. Dieser iteriert dabei mit einem Zeiger zeichenweise von links nach rechts über das Eingabewort und wendet eine von fünf Aktionen an, um die Ausgabe zu erzeugen. Zur Verfügung stehen die folgenden Aktionen:
+Der Umformungsprozess eines Eingabe-Lemmas in eine Ausgabeform wird in unserem System mittels eines String-Transduktors realisiert. Dieser iteriert dabei mit einem Zeiger zeichenweise von links nach rechts über das Eingabewort und wendet eine von fünf Aktionen an, um die Ausgabe zu erzeugen. Zur Verfügung stehen die folgenden Aktionen:
 
 \begin{itemize}
-    \item \action{EMIT} $s$ (für ein beliebiges Symbol $s$): Hängt $s$ an den Ausgabe-String an, unabhängig welches Zeichen der Zeiger gerade liest.
-    \item \action{COPY}: Hängt dasjenige Zeichen an den Output an, auf das der Zeiger im Input gerade zeigt.
-    \item \action{PATCH $x$}: Wende die Patch-Operation $x$ auf das Zeichen des Eingabe-Zeigers an, und hänge das resultierende Zeichen an den Output.
-    \item \action{MOVE}: Inkrementiere den Zeiger um 1 Zeichen, um also weiter über das Eingabewort zu laufen.
-    \item \action{EOW} (end of word): Den Transformationsprozess abschließen und die aktuelle Ausgabe als finalen Rückgabewert kennzeichnen.
+    \item \action{EMIT} $s$ (für ein beliebiges Symbol $s$): Hängt $s$ an den Ausgabe-String an, unabhängig davon, welches Zeichen der Zeiger gerade liest.
+    \item \action{COPY}: Hängt dasjenige Zeichen an die Ausgabe an, auf das der Zeiger im Lemma gerade zeigt.
+    \item \action{PATCH $x$}: Wende die Patch-Operation $x$ auf das Zeichen des Eingabe-Zeigers an, und hänge das resultierende Zeichen an den Ausgabe-String an.
+    \item \action{MOVE}: Inkrementiere den Zeiger um 1 Zeichen, um weiter über das Eingabewort zu laufen.
+    \item \action{EOW} (\underline{e}nd \underline{o}f \underline{w}ord): Den Transformationsprozess abschließen und die aktuelle Ausgabe als finalen Rückgabewert kennzeichnen.
 \end{itemize}
 
 Besonders ist hierbei die \action{PATCH}-Aktion, die den zuvor genannten Wandel eines Zeichens im Wortstamm erfassen soll. Die ganze Struktur wird in \autoref{sec:patches} genauer erläutert.
-Außerdem lässt sich auch ohne formalen Beweis schnell erkennen, dass der oben skizzierte Transducer jeden beliebigen Input auf jeden beliebigen Output abbilden kann, indem er nämlich pro Zeichen $o$ im Output-Word einfach $o$ emittiert und dann ein \action{EOW} ausgibt. Natürlich ist diese Herangehensweise sehr naiv und nutzt nicht die Tatsache, dass Lemma und flektierte Form oft einen gemeinsamen Wortstamm beinhalten; daher nutzen wir weitere Verfahren um dieses Verhalten zu optimieren.
+Außerdem lässt sich auch ohne formalen Beweis schnell erkennen, dass der oben skizzierte Transduktor jeden beliebigen Input auf jede beliebige Ausgabe abbilden kann, indem er nämlich pro Zeichen $o$ im Ausgabewort einfach $o$ emittiert und dann ein \action{EOW} ausgibt. Natürlich ist diese Herangehensweise sehr naiv und nutzt nicht die Tatsache, dass Lemma und flektierte Form oft einen gemeinsamen Wortstamm beinhalten; daher nutzen wir weitere Verfahren um dieses Verhalten zu optimieren.
 
 \subsection{Alignment}
 \label{sec:alignment}
-Lemma und Vollform werden durch einen Aligner über Füllzeichen so ausgerichtet, dass möglichst viele übereinstimmende Zeichen miteinander aligniert \todo{ist das ein deutsches Wort? Duden sagt Ja} sind. Dadurch ermöglichen wir dem Transducer möglichst viele \action{COPY}-Aktionen, die später eine erhebliche Vereinfachung bei der Anwendung der Flexionsregeln bedeuten.
+Lemma und Vollform werden durch einen Aligner über Füllzeichen so ausgerichtet, dass möglichst viele übereinstimmende Zeichen miteinander aligniert \todo{ist das ein deutsches Wort? Duden sagt Ja} sind. Dadurch ermöglichen wir dem Transduktor möglichst viele \action{COPY}-Aktionen, die später eine erhebliche Vereinfachung bei der Anwendung der Flexionsregeln bedeuten.
 
 Der Aligner selbst beruht auf der einfachen Editierdistanz nach \citet{levenshtein:binary66}. Wir haben lediglich eine weitere Bedingung hinzugefügt, die zwei verschiedene Zeichen $a, b$ auch dann mit Kosten $0$ berechnet, wenn ein Patch $p$ existiert, der $a$ in $b$ überführt. Nach Berechnung dieser Kostenfunktion wählen wir dasjenige Alignment, das die geringste Levenshtein-Distanz (zuzüglich unserer \action{PATCH}-Regel) ergibt.
 
 \subsection{Orakel-Algorithmus}
-Um schlussendlich aus einem Alignment zwischen Lemma und flektierter Form auch eine Aktionskette für den Transducer errechnen zu können, nutzen wir einen deterministischen Algorithmus der als statisches Orakel agiert. Eine genaue Darstellung findet sich in Algorithmus~\ref{alg:oracle}
+Um schlussendlich aus einem Alignment zwischen Lemma und flektierter Form auch eine Aktionskette für den Transduktor errechnen zu können, nutzen wir einen deterministischen Algorithmus der als statisches Orakel agiert. Eine genaue Darstellung findet sich in Algorithmus~\ref{alg:oracle}
 
 \begin{algorithm}[htb]
 \begin{algorithmic}
@@ -165,7 +165,7 @@ Um schlussendlich aus einem Alignment zwischen Lemma und flektierter Form auch e
 \STATE $actions$.append(\action{EOW})
 \RETURN{$actions$}
 \end{algorithmic}
-\caption{Deriving oracle actions gold standard from aligned input strings}
+\caption{Erstellen der Orakel-Aktionskette aus alignierten Eingabestrings}
 \label{alg:oracle}
 \end{algorithm}
 
@@ -175,9 +175,9 @@ Um schlussendlich aus einem Alignment zwischen Lemma und flektierter Form auch e
 \section{Erweitern der Trainingsdaten}
 \label{sec:enhancer}
 \subsection{Motivation}
-Als eines der großen Schwierigkeiten der Aufgabe haben wir die geringe Menge der Trainingsdaten, insbesondere in den Volumen \textit{low} und \textit{medium}, angesehen. Daher haben wir uns entschieden, die Möglichkeiten des Erweiterns von Trainingsdaten auszuloten. Eine Vorgabe des Shared Tasks war es, keine externe Quellen zu verwenden. Daher haben wir zusätzliche Daten aus den vorhandenen halluziniert. Die Idee ist dabei, Muster wie Suffix- und Präfix-Änderungen zu erkennen und zu replizieren, sodass das System diese Regelmäßigkeiten stärker lernt als seltenere, unregelmäßige Veränderungen.
+Als eines der großen Schwierigkeiten der Aufgabe haben wir die geringe Menge der Trainingsdaten, insbesondere in den Volumen \textit{low} und \textit{medium}, angesehen. Daher haben wir uns entschieden, die Möglichkeiten des Erweiterns von Trainingsdaten auszuloten. Eine Vorgabe des Shared Tasks war es, keine externe Quellen zu verwenden. Folglich haben wir uns darauf beschränkt zusätzliche Daten aus den vorhandenen Daten zu halluzinieren. Die Idee ist dabei, Muster wie Suffix- und Präfix-Änderungen zu erkennen und zu replizieren, sodass das System diese Regelmäßigkeiten besser lernen kann, auch wenn dadurch seltenere, unregelmäßige Veränderungen relativ gesehen weniger häufig in den erweiterten Trainingsdaten vorkommen.
 
-Einreichungen zu ähnlichen Shared Tasks der Vorjahre haben bereits Trainingsdaten erweitert, darunter auch die Sieger-Einreichung von 2016, \cite{kann-schutze:2016:SIGMORPHON}. Die Einreichung von \citet{bergmanis:augmenting} nutzte zwei Formen eines Sequence Encoders -- eine nutzte Lemmata und Zielformen als Inputs, die andere zufällige Strings.  Die zusätzlichen Trainingsdaten konnten das Ergebnis insgesamt verbessern\todo{wie? M}. \citet{kann-schutze:2017:K17-20} verwendet mehrere Systeme, darunter ein regelbasiertes System. Das System von \citet{silfverberg-EtAl:2017:K17-20} spaltet die Wörter in Präfix, Stamm und Suffix und generiert neue Wörter mit diesen Affixen. Weitere Arbeiten mit Erweiterung von Trainingsdaten sind \cite{zhou-neubig:2017:K17-20} und \cite{nicolai-EtAl:2017:K17-20}.
+Einreichungen zu ähnlichen Shared Tasks der Vorjahre haben bereits Trainingsdaten erweitert, darunter auch die Sieger-Einreichung von 2016 \cite{kann-schutze:2016:SIGMORPHON}. Die Einreichung von \citet{bergmanis:augmenting} nutzte zwei Formen eines Sequence Encoders -- eine nutzte Lemmata und Zielformen als Inputs, die andere zufällige Strings.  Die zusätzlichen Trainingsdaten konnten das Ergebnis insgesamt verbessern\todo{wie? M}. \citet{kann-schutze:2017:K17-20} verwendet mehrere Systeme, darunter ein regelbasiertes System. Das System von \citet{silfverberg-EtAl:2017:K17-20} spaltet die Wörter in Präfix, Stamm und Suffix und generiert neue Wörter mit diesen Affixen. Weitere Arbeiten mit Erweiterung von Trainingsdaten sind \cite{zhou-neubig:2017:K17-20} und \cite{nicolai-EtAl:2017:K17-20}.
 
 \subsection{Grundlegender Erweiterungsprozess}
 Um künstliche Daten für ein Datensatz zu generieren, sortiert unser System die Eingabe-Daten in Gruppen von Flexionen mit denselben Features. Innerhalb jeder Gruppe aligniert und vergleicht es jedes Paar von Lemma und Flexion mit jedem anderen Paar und behält pro Vergleich nur die übereinstimmenden Zeichen an den alignierten Positionen. Das Alignieren erfolgt wie in \autoref{sec:alignment} beschrieben. Die restlichen Zeichen werden gelöscht und nach einem Sprachmodell, das aus dem Datensatz generiert wird, aufgefüllt. Dabei werden die gleichen Zeichen, die im Lemma eingesetzt wurden, auch in der Flexion eingesetzt. Bleiben noch Lücken übrig, werden sie durch weitere Zeichen aus dem Modell aufgefüllt. Das Sprachmodell wird in \autoref{sec:enhancer-example} erläutert.
@@ -187,7 +187,7 @@ Das System produziert eine vorgegebene Anzahl an künstlichen Wörtern pro Paar.
 \subsection{Sprachmodell-Beispiel}
 \label{sec:enhancer-example}
 
-Aus dem Datensatz, aus dem neue Wörter generiert werden sollen, werden alle möglichen n-Gramme bis zu einer vorgegebenen Länge $n=5$ gezählt. In \autoref{fig:example-enhancer} wird ein Beispiel dargestellt. nachdem \texttt{iomm} eingefügt wurde, bleibt eine weitere Lücke, dargestellt durch \#. Um einen angemessenen Buchstaben zu finden, wird das Wort mit den n-Grammen des Sprachmodells verglichen, beginnend mit dem maximalen $n$, $5$. Die betrachteten Buchstaben werden von links nach rechts durchlaufen. Statt der Lücke können dabei beliebige Buchstaben im Modell stehen. Wird keine Übereinstimmung gefunden, wird $n$ um $1$ reduziert und wieder von links nach rechts gesucht. Dies wird wiederholt, bis ein n-Gramm gefunden wurde. In diesem Fall ist das längste n-Gramm \texttt{?ade}, der entsprechende Auszug aus dem Modell wird gezeigt in \autoref{tab:example-langmodel}. Anhand der Wahrscheinlichkeit der einzelnen Buchstaben statt der Lücke wird der Buchstabe ausgewählt, der das $?$ ersetzen sollen, in diesem Fall \texttt{p}.
+Aus dem Datensatz, aus dem neue Wörter generiert werden sollen, werden alle möglichen n-Gramme bis zu einer vorgegebenen Länge $n=5$ gezählt. In \autoref{fig:example-enhancer} wird ein Beispiel dargestellt. nachdem \texttt{iomm} eingefügt wurde, bleibt eine weitere Lücke, dargestellt durch \#. Um einen angemessenen Buchstaben zu finden, wird das Wort mit den n-Grammen des Sprachmodells verglichen, beginnend mit dem maximalen $n$, $5$. Die betrachteten Buchstaben werden von links nach rechts durchlaufen. Statt der Lücke können dabei beliebige Buchstaben im Modell stehen. Wird keine Übereinstimmung gefunden, wird $n$ um $1$ reduziert und wieder von links nach rechts gesucht. Dies wird wiederholt, bis ein n-Gramm gefunden wurde. In diesem Fall ist das längste n-Gramm \texttt{?ade}, der entsprechende Auszug aus dem Modell wird gezeigt in \autoref{tab:example-langmodel}. Anhand der Wahrscheinlichkeit der einzelnen Buchstaben statt der Lücke wird der Buchstabe ausgewählt, der das \texttt{?} ersetzen soll, in diesem Fall \texttt{p}.
 
 \begin{table}
 \centering
@@ -202,7 +202,7 @@ $\Downarrow$ & $\Downarrow$\\
 \texttt{iomm\textbf{ad}} & \texttt{iommp\textbf{ade}}\\
 \bottomrule
 \end{tabular}
-\caption{Ein Beispiel für die Erstellung eines künstlichen Wortes aus \textit{skapad} -- \textit{skapade} (ADJ;DEF), \lang{swedish}, ''erschaffen''}
+\caption{Ein Beispiel für die Erstellung eines künstlichen Wortes aus \textit{skapad} -- \textit{skapade} (ADJ;DEF), \lang{Swedish}, ''erschaffen''}
 \label{fig:example-enhancer}
 \end{table}
 
@@ -225,10 +225,12 @@ N-Gramm & Buchstabe & Frequenz & p\\ \midrule
 \label{tab:example-langmodel}
 \end{table}
 
-Theoretisch funktioniert dieses System besser mit größeren Datensätzen, da mehr Muster erkannt werden. Leider bedeutet dies auch, dass für kleinere Datensätze, bei denen es besonders nötig ist, die Qualität der künstlichen Daten geringer ist als für größere, bei denen es weniger nötig ist.
+Theoretisch funktioniert dieses System besser mit größeren Datensätzen, da mehr Muster erkannt werden. Leider bedeutet dies auch, dass für kleinere Datensätze, bei denen zusätzliche Trainingsdaten besonders wichtig sind, die Qualität der künstlichen Daten geringer ist als für größere, bei denen es weniger nötig ist.
 
 \section{Systemaufbau}
 \label{sec:architecture}
+
+
 
 \section{Feinabstimmung und Evaluation}
 \label{sec:tuning_evaluation}
