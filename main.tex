@@ -247,7 +247,14 @@ Ferner ist das Baseline-System hinsichtlich der Laufzeitperformanz fast allen an
 Weitere Details zur Umsetzung der Baseline finden sich in der Beschreibung des Shared Tasks aus dem letzten Jahr \cite{sigmorphon:st2017}.
 
 \subsection{Neuronales Netzwerk}
-todo
+Die eingesetzte neuronale Netzwerkarchitektur unseres Systems ist für jede der 103 Sprachen und die 3 Trainingsdatenmengen identisch.
+Die Architektur des Systems ist in \autoref{fig:arch} dargestellt. Das neuronale Netzwerk agiert dabei als Orakel für den String-Transduktor aus \autoref{sec:transducer}.
+Eingaben des gesamten Systems sind das Lemma eines Wortes sowie die Features der Zielflektionsform.
+In Abhängigkeit von Lemma, Features, aktueller Position des Zeigers und voriger Vorhersage gibt das Netzwerk je eine Aktion (\action{COPY}, \action{PATCH} $p$, \action{MOVE}, \action{EMIT} $s$ oder \action{EOW}) aus, die der String-Transduktor anwendet.
+Das Vorhersagen und Anwenden einer Aktion findet für jedes Eingabewort solange statt, bis \action{EOW} durch das neuronale Netzwerk ausgegeben wird. Abschließend finalisiert der String-Transduktor die Flexion des Wortes und gibt sie aus.
+
+In dem neuronalen Netzwerk verwenden wir eine Encoder-Decoder Architektur \citep{encdec:ChoMGBSB14, seq2seq:SutskeverVL14}
+
 
 \begin{figure}
 \includegraphics[width=\linewidth]{architecture_de}
