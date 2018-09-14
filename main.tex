@@ -84,7 +84,7 @@ erst kurz vor Ende der Entwicklungszeit veröffentlichtes Test-Set eine möglich
     \item \textbf{Levenshtein-Distanz} gemäß der klassischen Definition von \citet{levenshtein:binary66} um festzustellen, wie weit eine Ausgabe des Systems vom Goldstandard entfernt liegt. Insbesondere hat eine korrekte Ausgabe des Systems also immer einen Distanz-Wert von $0$
 \end{itemize}
 Ebenso wurde zusammen mit den Trainingsdaten ein Baseline-System ausgeliefert, das als Richtwert dient und von dem wir es uns zum Ziel genommen haben, die Accuracy zu schlagen und besser als die Baseline abzuschneiden.\todo[inline]{doppelt und dreifach gemoppelt imho, Baseline quasi == Richtwert, Accuracy schlagen == besser abschneiden. Besser so etwas wie ''Wir haben es uns zum Ziel genommen, mit unseren Ergebnissen in möglichst vielen Sprachen und möglichst weit über denen des Baseline-Systems zu liegen.''}
-Das Baseline-System wird in \autoref{sec:baseline} nähert erläutert.
+Das Baseline-System wird in \autoref{sec:baseline} näher erläutert.
 
 Letzten Endes wurden alle Systeme der Teilnehmer nach ihrer Accuracy miteinander verglichen, und wir haben uns dabei mit unserer Abgabe im soliden Mittelfeld positioniert. Insbesondere haben wir unsere Zielsetzung weitestgehend erreicht, und bis auf vereinzelte Ausreißer (die unter \autoref{sec:results} noch diskutiert werden) die Werte der Baseline überboten.
 
@@ -230,11 +230,24 @@ Theoretisch funktioniert dieses System besser mit größeren Datensätzen, da me
 
 \section{Systemaufbau}
 \label{sec:architecture}
-
+Das System, welches wir für den Shared Task entwickelt haben verwendet ein neuronales Netzwerk zusammen mit dem String-Transduktor aus \autoref{sec:transducer}. Bevor unser System im Detail vorgestellt wird, soll zuerst die Funktionsweise des Baseline-Systems dargestellt werden.
 
 \subsection{Baseline}
 \label{sec:baseline}
+Das Baseline-System basiert auf Mustererkennung in Prefix bzw. Suffix von Lemma und Flexion. Das System ist dabei stark von Vorgehensweisen von \cite{baseline:Ling2016} inspiriert.
 
+Zuerst werden alle Traningsdaten analysiert, wobei für jedes Paar von aligniertem Lemma und Flexion Feature-spezifische Prefix- und Suffix-Regeln extrahiert werden. Eine solche Regel bildet das Lemma oder ein Teil des Lemmas auf die korrekte flektierte Form ab.
+
+Unbekannte Kombinationen aus Lemma und Feature verarbeitet das System, indem die längste passende Regel angewandt wird, da dies die genausten Ergebnisse liefert. Gleichzeitig erfasst dieser Ansatz auch seltene Formen, da sich immer eine der Regeln anwenden lässt, auch wenn diese dann zwangsweise kürzer und eventuell nicht vollkommen korrekt sind.
+
+Die Baseline erreicht bereits mit wenigen Trainingsdaten in den meisten Sprachen gute Accuary Werte. Insbesondere auf dem kleinsten Traningsset schlägt sie viele der Systeme, die auf neuronalen Netzen basieren.
+
+Ferner ist das Baseline-System hinsichtlich der Laufzeitperformanz fast allen anderen System deutlich überlegen. Die  Vorhersage samt Analyse- bzw. Trainingsphase nimmt für alle 103 Sprachen über die 3 Trainingsdatenmengen nur wenige Minuten in Anspruch. Das Training eines neuronalen Netzwerks für eine einzelne Sprache benötigt dagegen in den meisten System mehr Zeit.
+
+Weitere Details zur Umsetzung der Baseline finden sich in der Beschreibung des Shared Tasks aus dem letzten Jahr \cite{sigmorphon:st2017}.
+
+\subsection{Neuronales Netzwerk}
+todo
 
 \begin{figure}
 \includegraphics[width=\linewidth]{architecture_de}
