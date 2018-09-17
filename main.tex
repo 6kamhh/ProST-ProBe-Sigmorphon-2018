@@ -172,6 +172,27 @@ Um schlussendlich aus einem Alignment zwischen Lemma und flektierter Form auch e
 
 \section{Patches}
 \label{sec:patches}
+Ein Kerngedanke unseres Systems sind die sogenannten \textit{Patches}. Diese repräsentieren eine grafische Änderung zwischen zwei ähnlichen Zeichen, und können in unserem Transducer als Aktionen engesetzt werden.
+
+Die Idee zur Verwendung dieser Patches kam uns als deutsche Muttersprachler bei den Buchstaben ä,ö und ü. Das Ziel ist es, den Übergang von \texttt{a} nach \texttt{ä} in einer Operation einzufangen, die man dann im Sinne einer partiellen Funktion $p(x)$ auch auf andere Zeichen anwenden kann. So würde aus $p($\texttt{o}$)$ zum Beispiel analog \texttt{ö}, aber der selbe Patch $p$ lässt sich nicht auf etwa \texttt{t} anwenden.
+
+\subsection{Motivation}
+Die zuvor beschriebene Einteilung von Patches erscheint sinnvoll, da viele Wörter im Deutschen den Wortstamm - also eben den Teil des Wortes den unsere Architektur optimalerweise einfach mit \action{COPY}-Wiederholungen übernehmen soll - bei der Flektion verändern (siehe Tabelle X).
+Ein ähnliches Phänomen lässt sich auch in anderen Sprachen beobachten \citep{wiese:umlaut2009;kendris:cedilla2001}, weswegen wir den Entschluss gefasst haben das Konzept der \textit{Patches} fest in unser System zu verbauen. Obgleich wir nicht jede der über 100 bereitgestellten Sprachen beherrschen, steht so zumindest auf jedem Datensatz die Möglichkeit zur Verfügung, Patch-Aktionen durchzuführen. Im schlimmsten Fall, d.h. falls eine Sprache dieses Konzept überhaupt nicht nutzt, würden auch keine Patches gelernt und das System fällt auf einen einfachen Transduktionsprozess mit ausschließlich \action{COPY}, \action{MOVE} und \action{EMIT}-Aktionen zurück.
+
+Eine weitere Inspiration war die zuvor bereits zitierte Arbeit von \citet{cjk-mt:LiuLLN17}, in der für ostasiatische Sprachen mit nicht-lateinischen Alphabeten die Auswirkung von Symbolfragmenten auf Pixelebene auf die Ergebnisse von Machine Translation untersucht wurde.
+Insbesondere der Code, den die Autoren online verfügbar gemacht haben, war uns eine große Hilfe für unsere eigene erste grundlegende Implementation.
+
+\subsection{Erzeugung}
+Die Erzeugung der Patches geschieht grundsätzlich mit Hilfe von gerenderten 2D-Pixelmatrizen der jeweiligen Zeichen. Wir erzeugen für jedes Zeichen eine binäre Matrix konstanter Höhe und Breite, die pro Eintrag Informationen darüber enthält ob ein Pixel schwarz ist oder nicht.
+Die sich daraus ergebenden Matrizen werden dann paarweise mit \texttt{XOR}-Operationen über den einzelnen Elementen verglichen, woraus sich genau diejenigen Pixel ergeben, die zwischen den beiden Eingabematrizen unterschiedlich sind. Insbesondere nutzen wir aber nur diejenigen Ergebnisse, die auf Grundlage desselben ASCII-Zeichens errechnet wurden; ein Patch von \texttt{f} nach \texttt{d} ist zwar technisch möglich, umfasst aber statt einer Gruppe von ähnlichen Anwendungen nur diese eine Symbolsequenz und bringt damit keinen Mehrwert gegenüber einem einfachen \action{EMIT} \texttt{d}.
+
+Eine Besonderheit stellt im lateinischen Alphabet der Buchstabe \texttt{i} dar, da der typische "i-Punkt" verschwindet und durch Akzentzeichen ersetzt wird. Im Gegensatz dazu wird bei allen anderen 25 Buchstaben des einfachen lateinischen Alphabets das Akzentzeichen \textit{hinzugefügt}, ohne die schon existierenden Pixel zu beeinflussen. Um dieses Verhalten auch für den Buchstaben \texttt{i} korrekt zu fassen, wird er in unserem System vor dem Rendern daher durch das türkische Symbol \texttt{ı} ohne Punkt ersetzt, um ein vergleichbares Ergebnis zu erzeugen. Nichtsdestotrotz könnte dieser Effekt auch in uns unbekannten Sprachen mit nicht-lateinischen Alphabeten auftreten, daher erlaubt es die Architektur problemlos, weitere "Ersetzungen" einzufügen falls gewünscht.
+
+\subsection{Zerlegung nach NFD-Standard}
+Das Unicode-Konsortium pflegt einen Katalog an Normalisierungsformen\footnote{siehe \url{http://unicode.org/reports/tr15/}}, die Abbildungen zwischen Zeichen und deren Bestandteilen realisieren. Viele gängige Modifikationen, die von unserer Patch-Komponente errechnet werden, sind auch als Symbolmodifikatoren im Unicode-Standard vertreten. Diese sind als Einzelzeichen (im Regelfall) nicht sichtbar, sondern werden erst mit einem weiteren Eingabebuchstaben gemeinsam in einem Multibyte-Zeichen dargestellt.
+
+Insbesondere verhält sich der \texttt{NFD}-Standard dabei sehr ähnlich zu unseren Patches. Er zerlegt ein Symbol in eine Kette aus allen möglichst atomaren Symbolbestandteilen, wie etwa \texttt{â} in das ASCII-Zeichen \texttt{a} und den Modifikator \texttt{U+0302}\footnote{Dieses Zeichen ist alleine nicht darstellbar/sichtbar, daher wurde hier bewusst der Codepunkt in der Unicode-Ebene angegeben}.
 
 \section{Erweitern der Trainingsdaten}
 \label{sec:enhancer}
