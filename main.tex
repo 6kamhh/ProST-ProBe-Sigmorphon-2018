@@ -257,7 +257,7 @@ Das System, welches wir für den Shared Task entwickelt haben verwendet ein neur
 \label{sec:baseline}
 Das Baseline-System basiert auf Mustererkennung in Prefix bzw. Suffix von Lemma und Flexion. Das System ist dabei stark von Vorgehensweisen von \cite{baseline:Ling2016} inspiriert.
 
-Zuerst werden alle Traningsdaten analysiert, wobei für jedes Paar von aligniertem Lemma und Flexion Feature-spezifische Prefix- und Suffix-Regeln extrahiert werden. Eine solche Regel bildet das Lemma oder ein Teil des Lemmas auf die korrekte flektierte Form ab.
+Zuerst werden alle Trainingsdaten analysiert, wobei für jedes Paar von aligniertem Lemma und Flexion die Wörter in Präfix, Stamm und Suffix getrennt werden. Aus diesen werden anschließend feature-spezifische Prefix- und Suffix-Regeln extrahiert. Eine solche Regel bildet das Lemma oder ein Teil des Lemmas auf die korrekte flektierte Form ab.
 
 Unbekannte Kombinationen aus Lemma und Feature verarbeitet das System, indem die längste passende Regel angewandt wird, da dies die genausten Ergebnisse liefert. Gleichzeitig erfasst dieser Ansatz auch seltene Formen, da sich immer eine der Regeln anwenden lässt, auch wenn diese dann zwangsweise kürzer und eventuell nicht vollkommen korrekt sind.
 
@@ -274,8 +274,20 @@ Eingaben des gesamten Systems sind das Lemma eines Wortes sowie die Features der
 In Abhängigkeit von Lemma, Features, aktueller Position des Zeigers und voriger Vorhersage gibt das Netzwerk je eine Aktion (\action{COPY}, \action{PATCH} $p$, \action{MOVE}, \action{EMIT} $s$ oder \action{EOW}) aus, die der String-Transduktor anwendet.
 Das Vorhersagen und Anwenden einer Aktion findet für jedes Eingabewort solange statt, bis \action{EOW} durch das neuronale Netzwerk ausgegeben wird. Abschließend finalisiert der String-Transduktor die Flexion des Wortes und gibt sie aus.
 
-In dem neuronalen Netzwerk verwenden wir eine Encoder-Decoder Architektur \citep{encdec:ChoMGBSB14, seq2seq:SutskeverVL14}
+In dem neuronalen Netzwerk verwenden wir eine Encoder-Decoder Architektur \citep{encdec:ChoMGBSB14, seq2seq:SutskeverVL14}, wie sie üblich ist um eine Sequenz in eine andere Sequenz zu überführen.
+Maschinelle Übersetzung stellt eine der wohl geläufigsten Anwendungsfälle dieser Architektur dar.
+Der Decoder wendet sich monoton den einzelnen Zeichenrepräsentationen des Lemmas zu, da sich dies für Aufgabe der morphologischen Flexion als vorteilhaft herausgestellt hat \citep{hardattention:AharoniG16,hardattention:AharoniEtAl}.
+Zusätzlich ermöglicht dieses Vorgehen unserem System die \action{COPY} und \action{PATCH} Operationen sinnvoll anzuwenden, da zu jeden Zeitpunkt klar ist, welche Eingabezeichen kopiert bzw. gepatcht werden soll.
 
+Sowohl der Encoder als auch der Decoder bestehen im Kern aus einer einzelnen Gated Recurrent Unit (GRU), die von \citet{encdec:ChoMGBSB14} als einfachere Alternative zu Long short-term memory (LSTM) entwickelt wurden.
+Für jedes Zeichen erstellen Embedding-Einheiten numerische Repräsentationen als Eingabe für die beiden GRUs.
+Der Encoder verwendet eine bidirektionale GRU, deren Ausgaben aus beiden Richtingen aufsummiert werden, damit auf beide Informationen auf einmal zugegriffen werden kann.
+Da der Decoder unidirektional ist, verwenden wir nur den Vorwärtsweg des Encoder-Zustands um den Decoder zu initialisieren.
+Im Decoder werden die Zeichen-Embeddings, der betrachtete Kontext und die Feature als Tensoren konkateniert und diese Kombination als Eingabe für die GRU genutzt.
+Die Ausgabe der GRU im Decoder durchläuft eine lineare Transformation gefolgt von einer logarithmischen Softmax-Operation, um die logarithmischen Wahrscheinlichkeiten für jede Transduktor Aktion zu ermitteln. 
+
+
+Bias und Gewichte für die GRUs und lineare Transformationen sind zufällig anhand einer uniformen Verteilung $\mathcal{U}(-\sqrt{1/s}, \sqrt{1/s})$ initialisiert. Dabei ist $s$ die Größe des internen Zustands einer GRU bzw. die Anzahl der Eingabe-Features. Die Embedding-Gewichte sind anhand einer Normalverteilung $\mathcal{N}(0, 1)$ zufällig initialisiert.
 
 \begin{figure}
 \includegraphics[width=\linewidth]{architecture_de}
