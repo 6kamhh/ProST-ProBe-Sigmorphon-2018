@@ -20,6 +20,7 @@
 \usepackage{algorithmic}
 \usepackage[skip=4pt]{caption}
 \usepackage{hyperref}
+\usepackage{rotating}
 
 \newcommand{\lang}[1]{\textit{#1}}
 \newcommand{\action}[1]{\texttt{#1}}
@@ -143,6 +144,7 @@ Lemma und Vollform werden durch einen Aligner über Füllzeichen so ausgerichtet
 Der Aligner selbst beruht auf der einfachen Editierdistanz nach \citet{levenshtein:binary66}. Wir haben lediglich eine weitere Bedingung hinzugefügt, die zwei verschiedene Zeichen $a, b$ auch dann mit Kosten $0$ berechnet, wenn ein Patch $p$ existiert, der $a$ in $b$ überführt. Nach Berechnung dieser Kostenfunktion wählen wir dasjenige Alignment, das die geringste Levenshtein-Distanz (zuzüglich unserer \action{PATCH}-Regel) ergibt.
 
 \subsection{Orakel-Algorithmus}
+\label{sec:orakel-alg}
 Um schlussendlich aus einem Alignment zwischen Lemma und flektierter Form auch eine Aktionskette für den Transduktor errechnen zu können, nutzen wir einen deterministischen Algorithmus der als statisches Orakel agiert. Eine genaue Darstellung findet sich in Algorithmus~\ref{alg:oracle}
 
 \begin{algorithm}[htb]
@@ -268,6 +270,11 @@ Ferner ist das Baseline-System hinsichtlich der Laufzeitperformanz fast allen an
 Weitere Details zur Umsetzung der Baseline finden sich in der Beschreibung des Shared Tasks aus dem letzten Jahr \cite{sigmorphon:st2017}.
 
 \subsection{Neuronales Netzwerk}
+\begin{figure}
+\includegraphics[width=\linewidth]{architecture_de}
+\caption{System-Architektur}
+\label{fig:arch}
+\end{figure}
 Die eingesetzte neuronale Netzwerkarchitektur unseres Systems ist für jede der 103 Sprachen und die 3 Trainingsdatenmengen identisch.
 Die Architektur des Systems ist in \autoref{fig:arch} dargestellt. Das neuronale Netzwerk agiert dabei als Orakel für den String-Transduktor aus \autoref{sec:transducer}.
 Eingaben des gesamten Systems sind das Lemma eines Wortes sowie die Features der Zielflektionsform.
@@ -287,13 +294,77 @@ Im Decoder werden die Zeichen-Embeddings, der betrachtete Kontext und die Featur
 Die Ausgabe der GRU im Decoder durchläuft eine lineare Transformation gefolgt von einer logarithmischen Softmax-Operation, um die logarithmischen Wahrscheinlichkeiten für jede Transduktor Aktion zu ermitteln. 
 
 
-Bias und Gewichte für die GRUs und lineare Transformationen sind zufällig anhand einer uniformen Verteilung $\mathcal{U}(-\sqrt{1/s}, \sqrt{1/s})$ initialisiert. Dabei ist $s$ die Größe des internen Zustands einer GRU bzw. die Anzahl der Eingabe-Features. Die Embedding-Gewichte sind anhand einer Normalverteilung $\mathcal{N}(0, 1)$ zufällig initialisiert.
+Bias und Gewichte für die GRUs und lineare Transformation sind zufällig anhand einer uniformen Verteilung $\mathcal{U}(-\sqrt{1/s}, \sqrt{1/s})$ initialisiert. Dabei ist $s$ die Größe des internen Zustands einer GRU bzw. die Anzahl der Eingabe-Features. Die Embedding-Gewichte sind anhand einer Normalverteilung $\mathcal{N}(0, 1)$ zufällig initialisiert.
 
-\begin{figure}
-\includegraphics[width=\linewidth]{architecture_de}
-\caption{System-Architektur}
-\label{fig:arch}
-\end{figure}
+
+Für die Verarbeitung eines Wortes, also Training oder Vorhersage, werden die nachfolgenden Schritte durchgeführt.
+Der Encoder verarbeitet das ganze Eingabe-Lemma als indexbasierten Tensor auf einmal. Dabei generiert dieser Ausgabe-Repräsentationen für jeden Eingabe-Buchstaben  sowie eine Repräsentation des internen Zustands für die gesamte Eingabe-Sequenz.
+Durch Verwendung einer externen Schleife produziert der Decoder eine einzelne Transduktor Aktion pro Schleifendurchlauf.
+In jedem Schritt erhält der Decoder als Eingabe seinen vorherigen internen Zustand, die zuletzt ausgegebene Aktion, die Ziel-Flexion Features und den zurzeit betrachteten Teil der Encoder-Ausgabe.
+Auf welchen Teil der Encoder-Ausgabe Zugriff gewährt wird, bestimmt der Index-Zeiger im Transduktor.
+Immer, wenn der Decoder eine \action{MOVE} Aktion ausgibt, wird der Index-Zeiger um eins erhöht, sodass der Decoder im folgenden Schleifendurchlauf die Encoder-Ausgabe für das nächste Lemma-Zeichen zugreift.
+Falls Aktionen den Index-Zeiger über die Länge des Lemmas hinaus schieben würden, so werde diese ignoriert.
+
+\subsection{Beamsearch}
+
+\begin{sidewaysfigure}[htbp]
+\centering
+\includegraphics[width=\linewidth, height=\textheight,keepaspectratio]{beam_search}
+\caption{Beispielhafter Beamsearch Decoding-Prozess}
+\label{fig:beam}
+\end{sidewaysfigure}
+
+Um die Vorhersagegenauigkeit unseres Systems zu verbessern, haben wir Beamsearch in den Decoding-Prozess eingebaut.
+Dies resultiert in mehreren Pfaden, von denen der Pfad mit der größten Wahrscheinlichkeit ausgewählt wird, um das finale flektierte Ausgabewort zu erstellen.
+Die dazu benötigten Informationen werden in einem zusätzlichen Transduktorzustandobjekt vorgehalten.
+Dies umfasst den internen Zustand des Decoders, die vorhergesagte Aktion mitsamt ihrer logarithmischen Wahrscheinlichkeit sowie den resultierenden Ausgabe-String für jeden Einzelschritt und Pfad im Decoding-Beam.
+
+\todo[inline]{Beam-Decoding Beispiel erklären}
+
+
+
+\subsection{Training}
+
+Da das neuronale Netzwerk eine Sequenz von Transduktor Aktionen ausgibt, handelt es sich bei den Trainingszielen nicht um flektierte Wörter, sondern ebenfalls um Aktionssequenzen, die die eigentlichen Flexionen produzieren, wenn sie auf das Lemma angewandt werden.
+Diese Aktionssequenzen werden zuvor von unserem System erzeugt, indem im Gleichschritt über das alignierte Lemma und das flektierte Wort iteriert wird.
+Für jede Zeichenkombination werden die zugehörigen Aktionen der neuen Ausgabesequenz hinzugefügt.
+Der Algorithmus ist im Detail in \autoref{sec:orakel-alg} beschrieben.
+
+
+Trainingsupdates werden mittels Backpropagation durch den Adam Optimierer \citep{adam:KingmaB14} durchgeführt.
+Dieser ist mit den folgenden Paramtern konfiguriert: \textit{Learning rate} $\alpha=0.005$, \textit{Momentum Decays} $\beta_1=0.9$, $\beta_2=0.999$, \textit{Numerical Stabilizer} $\epsilon=10^{-8}$ und \textit{Weight Decay} (L2 Regularisierung) von $0.001$.
+
+
+Das implementierte Beam-Decoding erlaubt eine globale Normalisierung des neuronalen Netzwerks laut \citet{globalnorm:AndorAWSPGPC16}.
+Leider konvergiert das Training des Models mit globaler Normalisierung und Beamsearch in unseren Versuchen nicht.
+\citet{globalnorm:AndorAWSPGPC16} haben vortrainierte Gewichte mittels lokaler Normalisierung verwendet, um dieses Problem zu umgehen.
+Da wir allerdings keine robuste Möglichkeit zum Wechseln von lokaler zu globaler Normalisierung für alle 103 Sprachen finden konnten, setzen wir ausschließlich lokale Normalisierung im Training ein.
+Sobald der korrekte Pfad aus dem Beam während des Dekodierens fällt, wird ein Trainingsupdate mit unserer spezifischen \textit{Loss}-Funktion auf Grundlage der logarithmischen Wahrscheinlichkeiten der einzelnen Schritte im korrekten Pfad durchgeführt.
+
+
+%The loss function shown in eq.~\eqref{eq:loss} is based on the locally normalized path probability presented in eq.~(4) of \citet{globalnorm:AndorAWSPGPC16}. It calculates the negated sum over the log-likelihood $l$ of the correct action in each step of the path. Dividing by the natural logarithm of the sequence length $s$ results in a consistent loss magnitude, thus helping the training process to converge more easily. We assume this is the case because we sum up the error across all steps, also punishing the correct predictions if the system was not 100\% confident. The resulting loss $L$ is used to perform the training update back through the entire network.
+
+
+Die \textit{Loss}-Funktion in \autoref{eq:loss} basiert auf der lokal normalisierten Pfadwahrscheinlichkeit, die als Gleichung (4) in \citet{globalnorm:AndorAWSPGPC16} gezeigt ist. 
+
+
+\begin{equation}
+\label{eq:loss}
+L = - \frac{\sum_i^s l_i}{\ln{(1+s)}}
+\end{equation}
+
+% \todo[inline]{Arnes Vermutung weiter ausbauen: Viele Updates nötig, auch wenn das betrafen von richtigen decoding Schritten eigentlich unfug ist, bei beam-search passiert zu wenige Updates}
+%Although local normalization restored convergence of learning, we could not find a significant advantage in using multiple beams during training.
+%One explanation why our model did not benefit from beam-search might be that it requires many training updates. Punishing the correct steps in the decoding process leads to many updates while with beam-search updates may be too infrequent.%.
+
+%Our final training and evaluation is done with a beam-size of 1. However, the architecture is prepared to utilize both beam-search and global normalization in the future. Training with a single beam and evaluating with multiple beams to find better predictions is also supported. Due to the complex implementation of beam search and combined batching the system works on single training samples by using a batch size of 1.
+
+\subsection{Vergleich mit vorigen Architekturen}
+%Although our approach follows the "Align and Copy" idea of \citet{cluzh:MakarovRC17} the architectures differ. \citeauthor{cluzh:MakarovRC17} proposed two different models: Hard attention model with copy mechanism (HACM) and hard attention model over edit actions (HAEM). Both contain an encoder-decoder with LSTMs. HACM uses a mixture of character generation and copying probability distribution to implement the copy mechanism.
+
+% Our architecture is more similar to HAEM. The latter uses additional LSTMs storing representations of the predicted inflected form, action history and deleted lemma characters. The decoder feeds a concatenation of the feature vector, currently attended encoder output and extra representations through a rectified linear unit followed by a softmax to produce outputs like \action{COPY}, \action{WRITE} and \action{DELETE}. 
+
+
 
 \section{Feinabstimmung und Evaluation}
 \label{sec:tuning_evaluation}
