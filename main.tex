@@ -21,6 +21,8 @@
 \usepackage[skip=4pt]{caption}
 \usepackage{hyperref}
 \usepackage{rotating}
+\usepackage{afterpage}
+\usepackage{pdflscape}
 
 \newcommand{\lang}[1]{\textit{#1}}
 \newcommand{\action}[1]{\texttt{#1}}
@@ -307,12 +309,25 @@ Falls Aktionen den Index-Zeiger über die Länge des Lemmas hinaus schieben wür
 
 \subsection{Beamsearch}
 
-\begin{sidewaysfigure}[htbp]
-\centering
-\includegraphics[width=\linewidth, height=\textheight,keepaspectratio]{beam_search}
-\caption{Beispielhafter Beamsearch Decoding-Prozess}
-\label{fig:beam}
-\end{sidewaysfigure}
+% dreht die Seite nicht, sondern nur die Grafik (leichter Druck, schlecht am Bildschirm)
+%\begin{sidewaysfigure}[htbp]
+%\centering
+%\includegraphics[width=\linewidth, height=\textheight,keepaspectratio]{beam_search}
+%    \caption{Beispielhafter Beamsearch Decoding-Prozess}
+%    \label{fig:beam}
+%\end{sidewaysfigure}
+
+% dreht eine ganze Seite
+\afterpage{
+\begin{landscape}
+  \begin{figure}[htbp]
+  \centering
+    \includegraphics[width=\linewidth, height=\textheight,keepaspectratio]{beam_search}
+    \caption{Beispielhafter Beamsearch Decoding-Prozess}
+    \label{fig:beam}
+  \end{figure}
+\end{landscape}
+}
 
 Um die Vorhersagegenauigkeit unseres Systems zu verbessern, haben wir Beamsearch in den Decoding-Prozess eingebaut.
 Dies resultiert in mehreren Pfaden, von denen der Pfad mit der größten Wahrscheinlichkeit ausgewählt wird, um das finale flektierte Ausgabewort zu erstellen.
@@ -364,14 +379,7 @@ Zur Abgabe der Daten für den Shared Task haben wir auf Beam-Decoding verzichtet
 Die entwickelte Architektur ist allerdings bereit sowohl Beam-Decoding als auch globale Normalisierung zu verwenden.
 Auf dieser Grundlage haben wir auch noch weitere Untersuchungen vorgenommen, die später vorgestellt werden.
 So ist beispielsweise auch das Trainieren mit einem einzigen Pfad und gleichzeitiges Evaluieren mit mehreren Pfaden möglich. Dadurch kann die Vorhersage verbessert werden, ohne die Trainingslaufzeit zu erhöhen.
-Aufgrund der relativ komplexen Implementierung des Beam-Decoding haben wir bis zur Abgabe des Shared Tasks kein Mini-Batching implementiert. Nachträglich ist jedoch auch Mini-Batching eingebaut worden.
-
-\subsection{Vergleich mit vorigen Architekturen}
-%Although our approach follows the "Align and Copy" idea of \citet{cluzh:MakarovRC17} the architectures differ. \citeauthor{cluzh:MakarovRC17} proposed two different models: Hard attention model with copy mechanism (HACM) and hard attention model over edit actions (HAEM). Both contain an encoder-decoder with LSTMs. HACM uses a mixture of character generation and copying probability distribution to implement the copy mechanism.
-
-% Our architecture is more similar to HAEM. The latter uses additional LSTMs storing representations of the predicted inflected form, action history and deleted lemma characters. The decoder feeds a concatenation of the feature vector, currently attended encoder output and extra representations through a rectified linear unit followed by a softmax to produce outputs like \action{COPY}, \action{WRITE} and \action{DELETE}. 
-
-
+Aufgrund der relativ komplexen Implementierung des Beam-Decoding haben wir bis zur Abgabe des Shared Tasks kein Mini-Batching implementiert. Nachträglich ist jedoch auch Mini-Batching eingebaut worden, um das Training hinsichtlich Konvergenz und Ressourcenauslastung zu optimieren.
 
 \section{Feinabstimmung und Evaluation}
 \label{sec:tuning_evaluation}
