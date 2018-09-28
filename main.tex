@@ -342,10 +342,11 @@ Da wir allerdings keine robuste Möglichkeit zum Wechseln von lokaler zu globale
 Sobald der korrekte Pfad aus dem Beam während des Dekodierens fällt, wird ein Trainingsupdate mit unserer spezifischen \textit{Loss}-Funktion auf Grundlage der logarithmischen Wahrscheinlichkeiten der einzelnen Schritte im korrekten Pfad durchgeführt.
 
 
-%The loss function shown in eq.~\eqref{eq:loss} is based on the locally normalized path probability presented in eq.~(4) of \citet{globalnorm:AndorAWSPGPC16}. It calculates the negated sum over the log-likelihood $l$ of the correct action in each step of the path. Dividing by the natural logarithm of the sequence length $s$ results in a consistent loss magnitude, thus helping the training process to converge more easily. We assume this is the case because we sum up the error across all steps, also punishing the correct predictions if the system was not 100\% confident. The resulting loss $L$ is used to perform the training update back through the entire network.
-
-
-Die \textit{Loss}-Funktion in \autoref{eq:loss} basiert auf der lokal normalisierten Pfadwahrscheinlichkeit, die als Gleichung (4) in \citet{globalnorm:AndorAWSPGPC16} gezeigt ist. 
+Die \textit{Loss}-Funktion in \autoref{eq:loss} basiert auf der lokal normalisierten Pfadwahrscheinlichkeit, die als Gleichung (4) in \citet{globalnorm:AndorAWSPGPC16} dargestellt ist.
+Sie berechnet die negierte Summe über die logarithmischen Wahrscheinlichkeiten $l$ der korrekten Aktion für jeden Schritt des Pfades.
+Das Dividieren durch den natürlichen Logarithmus der Sequenzlänge $s$ führt zu gleichmäßigeren \textit{Loss}-Größenordnungen, was dem Trainingsprozess hilft besser zu konvergieren.
+Wir vermuten, dass dies der Fall ist, da wir die Fehler über alle Schritte aufsummieren, wozu auch korrekte Vorhersagen zählen bei denen das System nur nicht 100 \% sicher ist.
+Das berechnete Ergebnis $L$ der Funktion wird anschließend verwendet, um die Trainingsupdates mittels \textit{Backpropagation} zurück durch das gesamte neuronale Netzwerk durchzuführen.
 
 
 \begin{equation}
@@ -353,11 +354,17 @@ Die \textit{Loss}-Funktion in \autoref{eq:loss} basiert auf der lokal normalisie
 L = - \frac{\sum_i^s l_i}{\ln{(1+s)}}
 \end{equation}
 
-% \todo[inline]{Arnes Vermutung weiter ausbauen: Viele Updates nötig, auch wenn das betrafen von richtigen decoding Schritten eigentlich unfug ist, bei beam-search passiert zu wenige Updates}
-%Although local normalization restored convergence of learning, we could not find a significant advantage in using multiple beams during training.
-%One explanation why our model did not benefit from beam-search might be that it requires many training updates. Punishing the correct steps in the decoding process leads to many updates while with beam-search updates may be too infrequent.%.
 
-%Our final training and evaluation is done with a beam-size of 1. However, the architecture is prepared to utilize both beam-search and global normalization in the future. Training with a single beam and evaluating with multiple beams to find better predictions is also supported. Due to the complex implementation of beam search and combined batching the system works on single training samples by using a batch size of 1.
+Durch den Verzicht auf globale Normalisierung und die Verwendung von lokaler Normalisierung konnten wir das Konvergieren des Lernprozesses wiederherstellen. Allerdings konnten wir dadurch keine signifikanten Vorteile in der Verwendung mehrerer Beams während es Trainings finden.
+Eine mögliche Erklärung weshalb unser Netzwerkmodell im Training nicht von Beam-Decoding profitiert ist, dass das Modell viele Trainingsupdates erfordert.
+Während durch das Bestrafen korrekter Schritte des Decoding-Prozesses viele Trainingsupdates entstehen, könnten diese bei Beam-Decoding zu selten sein, da mit höherer Wahrscheinlichkeit ein korrekter Pfad im Beam vorhanden ist.
+
+
+Zur Abgabe der Daten für den Shared Task haben wir auf Beam-Decoding verzichtet, indem wir als Anzahl der Pfade $1$ verwendet haben.
+Die entwickelte Architektur ist allerdings bereit sowohl Beam-Decoding als auch globale Normalisierung zu verwenden.
+Auf dieser Grundlage haben wir auch noch weitere Untersuchungen vorgenommen, die später vorgestellt werden.
+So ist beispielsweise auch das Trainieren mit einem einzigen Pfad und gleichzeitiges Evaluieren mit mehreren Pfaden möglich. Dadurch kann die Vorhersage verbessert werden, ohne die Trainingslaufzeit zu erhöhen.
+Aufgrund der relativ komplexen Implementierung des Beam-Decoding haben wir bis zur Abgabe des Shared Tasks kein Mini-Batching implementiert. Nachträglich ist jedoch auch Mini-Batching eingebaut worden.
 
 \subsection{Vergleich mit vorigen Architekturen}
 %Although our approach follows the "Align and Copy" idea of \citet{cluzh:MakarovRC17} the architectures differ. \citeauthor{cluzh:MakarovRC17} proposed two different models: Hard attention model with copy mechanism (HACM) and hard attention model over edit actions (HAEM). Both contain an encoder-decoder with LSTMs. HACM uses a mixture of character generation and copying probability distribution to implement the copy mechanism.
