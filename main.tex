@@ -11,6 +11,7 @@
 \usepackage{url}
 \usepackage{microtype}
 \usepackage{paralist}
+\usepackage{tabularx}
 \usepackage{booktabs}
 \usepackage{covington}
 \usepackage{verbatim}
@@ -379,19 +380,203 @@ Zur Abgabe der Daten für den Shared Task haben wir auf Beam-Decoding verzichtet
 Die entwickelte Architektur ist allerdings bereit sowohl Beam-Decoding als auch globale Normalisierung zu verwenden.
 Auf dieser Grundlage haben wir auch noch weitere Untersuchungen vorgenommen, die später vorgestellt werden.
 So ist beispielsweise auch das Trainieren mit einem einzigen Pfad und gleichzeitiges Evaluieren mit mehreren Pfaden möglich. Dadurch kann die Vorhersage verbessert werden, ohne die Trainingslaufzeit zu erhöhen.
-Aufgrund der relativ komplexen Implementierung des Beam-Decoding haben wir bis zur Abgabe des Shared Tasks kein Mini-Batching implementiert. Nachträglich ist jedoch auch Mini-Batching eingebaut worden, um das Training hinsichtlich Konvergenz und Ressourcenauslastung zu optimieren.
+Aufgrund der relativ komplexen Implementierung des Beam-Decoding haben wir bis zur Abgabe des Shared Tasks kein Mini-Batching implementiert. Nachträglich ist jedoch auch Mini-Batching eingebaut worden, um das Training hinsichtlich Konvergenz und Rechner-Ressourcenauslastung zu optimieren.
 
 \section{Feinabstimmung und Evaluation}
 \label{sec:tuning_evaluation}
+Um die Ergebnisse unseres Systems zu verbessern, haben wir eine extensive Hyperparameter-Suche vorgenommen.
+Der zuvor geschilderte Aufbau des Systems ist dabei für alle Sprachen identisch.
+Je Sprache und Größe des Trainingsdatensatzes haben wir eine unabhängige Hyperparameter-Suche auf einer zufälligen Auswahl aus dem Such-Raster der Parameter durchgeführt.
+\autoref{tab:params} listet die Hyperparamter mitsamt ihrer möglichen Werte auf.
+
+\begin{table}[]
+    \centering
+    \begin{tabularx}{\textwidth}{lcX}
+    \toprule
+    \textbf{Parameter} & \textbf{Werte} & \textbf{Beschreibung}\\
+    \midrule
+        GRU Größe & 32, 64, 128 & Tensor Größe des internen Zustands von Encoder \& Decoder\\
+        Embedding Größe & 8, 16 & Tensor Größe der Zeichen-Embeddings\\
+        Patches & ja, nein & Verwendung der Patches aktiv?\\
+        Enhancer & 0\times, 1\times, 5\times & Faktor der Erzeugung zusätzlicher Trainingsdaten\\
+    \bottomrule
+    \end{tabularx}
+    \caption{Hyperparameter}
+    \label{tab:params}
+\end{table}
+
+Während der Entwicklungsphase des Systems ist uns aufgefallen, dass die zufällige Initialisierung der Netzwerkgewichte großen Einfluss auf die Ergebnisse haben. Es handelt sich dabei um ein typisches Problem, welches insbesondere dann auftritt, wenn nur wenige Traningsdaten zur Verfügung stehen.
+Aus diesem Grund wird in unserer Hyperparamter-Suche jede Parameterkombination mit fünf verschiedenen Zufalls-Seeds durchlaufen, wodurch sowohl die Netzwerkgewichte andere Startwerte annehmen als auch die Reihenfolge der einzelnen Trainingsdatenpunkte variiert.
+
+Darüber hinaus konnten wir feststellen, dass unser System in der Vorhersage manchmal das Wort nicht mit \action{EOW} beendet und stattdessen endlos einen nicht existierenden Buchstaben des Lemmas mit \action{COPY} kopieren möchte oder aber ein beliebiges Zeichen mit \action{EMIT} andauernd wiederholt.
+Daher enthält der String-Transduktor Maßnahmen um diese Probleme zu entschärfen.
+Wenn der Zeiger bereits über das Eingabewort hinaus bewegt wurde, greifen folgende Regelungen:
+Die Aktionen \action{COPY} und \action{PATCH} werden nicht mehr angewandt. Die \action{EMIT} Aktion kann das zuvor geschriebene Zeichen nicht erneut ausgeben. 
+Dadurch können jedoch die flektierten Formen in einigen Ausnahmefällen einzelne Zeichen am Ende vermissen. 
+
+Für die finale Evaluation der Test-Datensätze haben wir die beste Parameterkombination (inklusive Zufalls-Seed) für ein jedes Paar aus Sprache und Größe des Trainingsdatensatzes auf Basis der Levenshtein-Distanz der Ergebnisse auf dem bereitgestellten Entwicklungsdatensatz verwendet.
+
 
 \section{Ergebnisse und Diskussion}
 \label{sec:results}
 
-\section{Schwierigkeiten}
-\label{sec:difficulties}
+\subsection{Eingereichte Ergebnisse}
+\label{sec:eingereichte_ergebnisse}
 
-\section{Was wir gelernt haben}
+\begin{table}
+\small
+\centering
+\begin{tabular}{lr|lr|lr}
+\toprule
+\textbf{high}             & & \textbf{medium}                 &  & \textbf{low}                  &  \\
+\midrule
+\textbf{Teilnehmer}                & \textbf{Accuracy}               & \textbf{Teilnehmer}                & \textbf{Accuracy}                & \textbf{Teilnehmer}                & \textbf{Accuracy}
+\\
+\rule{0pt}{3ex}uzh-01                     & 96                     & uzh-01                     & 86.64                   & uzh-02                     & 57.21                  \\
+uzh-02                     & 95.97                  & uzh-02                     & 86.38                   & uzh-01                     & 57.18                  \\
+bme-02                     & 94.66                  & iitbhu-iiith-02            & 84.19                   & ua-08                      & 53.22                  \\
+iitbhu-iiith-02            & 94.43                  & iitbhu-iiith-01            & 82.9                    & iitbhu-iiith-02            & 52.6                   \\
+iitbhu-iiith-01            & 94.43                  & waseda-01                  & 77.38                   & ua-05                      & 50.53                  \\
+bme-03                     & 93.97                  & msu-04                     & 76.4                    & iitbhu-iiith-01            & 49.79                  \\
+bme-01                     & 93.88                  & msu-03                     & 75.74                   & ua-06                      & 49.73                  \\
+msu-04                     & 91.87                  & \textbf{hamburg-01}        & \textbf{74.03}          & ua-03                      & 44.82                  \\
+iit-varanasi-01            & 91.73                  & iit-varanasi-01            & 70.17                   & waseda-01                  & 44.09                  \\
+waseda-01                  & 91.12                  & msu-02                     & 69.45                   & msu-02                     & 41.61                  \\
+msu-03                     & 90.52                  & bme-01                     & 67.43                   & \textbf{hamburg-01}        & \textbf{40.28}         \\
+axsem.-01             & 84.19                  & bme-03                     & 67.36                   & ua-02                      & 39.19                  \\
+msu-02                     & 82.68                  & bme-02                     & 67.26                   & ua-01                      & 38.22                  \\
+\textbf{hamburg-01}        & \textbf{77.53}         & \textit{\textbf{baseline}} & \textit{\textbf{61.78}} & \textit{\textbf{baseline}} & \textit{\textbf{38.2}} \\
+\textit{\textbf{baseline}} & \textit{\textbf{75.3}} & axsem.-02             & 60                      & ua-07                      & 37.99                  \\
+axsem.-02             & 74.77                  & msu-01                     & 54.44                   & msu-04                     & 31.4                   \\
+msu-01                     & 74.33                  & tueb.-oslo-03          & 30.98                   & msu-03                     & 25.86                  \\
+racai-01                   & 72.49                  & tueb.-oslo-02          & 29.72                   & iit-varanasi-01            & 23.33                  \\
+tueb.-oslo-03          & 63.05                  & kucst-01                   & 29.12                   & ua-04                      & 21.25                  \\
+tueb.-oslo-02          & 56.6                   & tueb.-oslo-01          & 20.97                   & axsem.-02             & 14.74                  \\
+tueb.-oslo-01          & 49.52                  & axsem.-01             & 9.1                     & tueb.-oslo-02          & 4.43                   \\
+kucst-01                   & 48.68                  & ua-08                      & 0                       & bme-01                     & 3.74                   \\
+ua-08                      & 0                      & ua-07                      & 0                       & bme-03                     & 3.63                   \\
+ua-07                      & 0                      & ua-06                      & 0                       & kucst-01                   & 2.52                   \\
+ua-06                      & 0                      & ua-05                      & 0                       & bme-02                     & 2.43                   \\
+ua-05                      & 0                      & ua-04                      & 0                       & tueb.-oslo-03          & 1.39                   \\
+ua-04                      & 0                      & ua-03                      & 0                       & axsem.-01             & 0.7                    \\
+ua-03                      & 0                      & ua-02                      & 0                       & tueb.-oslo-01          & 0                      \\
+ua-02                      & 0                      & ua-01                      & 0                       & racai-01                   & 0                      \\
+ua-01                      & 0                      & racai-01                   & 0                       & msu-01                     & 0         
+\\
+\bottomrule
+\end{tabular}
+\caption{Ergebnisse (Accuracy) aller Teilnehmer am Shared Task für alle Mengen.\\\textit{0}: keine Einreichung des Teilnehmers. \smaller{\textit{tueb.-oslo}: tuebingen-oslo, \textit{axsem.}: axsemantics.}}
+%Abrufbar unter: \url{https://docs.google.com/spreadsheets/d/1HqOGRyltYvji7pi-jq3swEfoWs15k5QU-lA3ua8dpmo/}
+\label{fig:results_all}
+\end{table}
+
+\begin{table}
+\centering
+\begin{tabular}{lrrr}
+\toprule
+                 & high   & medium & low    \\
+                 \midrule
+Baseline         & 75.5\% & 64.8\% & 38.2\% \\
+Ø aller Systeme & 81.3\% & 61,0\% & 30.7\% \\
+Wir              & 77.5\% & 74,0\% & 40.3\% \\
+\bottomrule
+\end{tabular}
+\caption{Unsere Ergebnisse (Accuracy) im Vergleich.  Durchschnitt ohne $0$}
+\label{fig:acc_comparison}
+\end{table}
+
+\begin{table}[htb]
+\centering
+\begin{tabular}{lrrr}
+\toprule
+         & high & medium & low  \\
+         \midrule
+Baseline & 0.52 & 0.91   & 1.86 \\
+Wir      & 0.45 & 0.52   & 1.47\\
+\bottomrule
+\end{tabular}
+\caption{Unsere Ergebnisse (durchschnittliche Levenshtein-Distanz) im Vergleich zur Baseline. Levenshtein-Ergebnisse anderer Teilnehmer lagen nicht vor.}
+\label{fig:lev_comparison}
+\end{table}
+
+In \autoref{fig:results_all} sind die veröffentlichten Ergebnisse aller Teilnehmer für alle Datenmengen dargestellt. Wir konnten uns im guten Mittelfeld positionieren und stets die Baseline schlagen.
+
+Die beste Position (Position 8 von 21, oberen $38.1\%$) und die größte Verbesserung im Vergleich zur Baseline ($+12.15\%$) konnten wir mit einer Genauigkeit von $74.03\%$ auf der Menge \textit{medium} erreichen . Auf \textit{high} und \textit{low} lagen unsere Ergebnisse mit $77.53\%$ bzw. $40.28\%$ etwa $2\%$ über der Baseline und in den oberen $63.6\%$ beziehungsweise $40.7\%$ der eingereichten Ergebnisse.
+
+\autoref{tab:medium_averages} zeigt die 
+
+\begin{table}
+\centering
+\small
+\begin{tabular}{llrr}
+  \toprule
+                           & \textbf{Sprachen}  &\textbf{Wir} & \textbf{BL} \\
+\midrule\textbf{Beste Sprachen}   & Uzbek              & $100.0$      & $96.0$ \\
+                           & Mapudungun         & $100.0$      & $82.0$ \\
+                           & Classical-Syriac   & $97.0$       & $99.0$ \\
+%\midrule
+\textbf{Schlechteste Sprachen}         & Old-Irish          & $6.0$        & $16.0$ \\
+                           & Haida              & $16.1$       & $61.0$ \\
+                           & Latin              & $21.4$       & $37.6$ \\
+%\midrule
+\midrule
+\textbf{max(Wir - BL)}    & Swahili            & $95.0$         & $0.0$ \\
+                           & Murrinhpatha       & $88.0$       & $0.0$ \\
+                           & Zulu               & $81.8$       & $0.1$ \\
+\textbf{max(BL - Wir)}    & Neapolitan         & $49.0$       & $94.0$ \\
+                           & Haida              & $16.0$       & $61.0$ \\
+                           & Latin              & $21.4$       & $37.6$ \\
+\bottomrule
+\end{tabular}
+
+\vspace{1ex}
+\textbf{Über Baseline:} $73$  \quad \textbf{durchschn. Diff.:} $20.2$\\
+\textbf{Unter Baseline:} $29$ \quad \textbf{durchschn. Diff.:} $-7.7$
+\caption{Unsere Ergebnisse verglichen mit der Baseline. Sprachen am weitesten \textbf{über} und \textbf{unter} der Baseline, trainiert auf dem Training-Set \textit{medium} und evaluiert auf dem Test-Set.}
+\label{tab:medium_averages}
+\end{table}
+
+
+\subsection{Effekt von Patches und Enhancer}
+
+
+\todo[inline]{Effekt von Patches}
+
+Auf die niedrige Datenmenge verbesserte der künstlich erweiterte Datensatz (bestes Ergebnis von \times 1 und \times 5) die Accuracy von 42 Datensätzen. Die Wahrscheinlichkeit, dass dies zufällige Beobachtungen sind, liegt bei $0.3049$ \citep{biostat:zar}. Der durchschnittliche Effekt über alle Sprachen beträgt $+1.3\%$, die maximale Verbesserung konnte mit $+10.8\%$ auf \lang{french} erreicht werden.
+
+
+\section{Teilnahme am Shared Task und Paper}
+\label{sec:paper}
+\todo{besser benennen}
+\todo[inline]{Hier können wir schreiben, wie wir am Shared Task teilgenommen haben (Wann wir die Daten bekommen haben, wann wir was abgegeben haben etc.), statt es wie in der Präsentation etwas zu verteilen. Und eben über das Paper berichten. Können das aber wieder trennen oder die Teilnahme-Details ganz weglassen.}
+
+Pünktlich zur Frist der ersten Abgabe haben wir den ersten Entwurf des Papers anonymisiert am 15. August 2018 eingereicht. Das Paper hat acht Seiten plus Bibliographie. Am 23. August 2018 haben wir die Nachricht bekommen, dass das Paper akzeptiert wurde, sowie das Feedback zweier anonymer Kritiker. Dieses beinhaltete unter anderem, dass das Paper \enquote{verständlich geschrieben} sei, mehr Experimente zum Effekt der Patches nötig seien, weitere Zitate für den Enhancer sowie den Hinweis auf Unicode NDF-Dekomposition. Außerdem haben beide Gutachter das Paper nach bestimmten Kriterien bewertet, siehe Tabelle \ref{tab:review}. Beide Reviewer haben dabei die gleichen Wertungen abgegeben, nur die \textit{Reviewer Confidence} unterschied sich bei den beiden Gutachtern. Mit der maximalen Punktzahl wurde die Klarheit des Papers bewertet. Mit einer Wertung von 3 wurde der \textit{Impact of Ideas or Results} am schlechtesten bewertet. Da sich unser System nicht deutlich von anderen System oder bisherigen Ergebnissen absetzen kann, ist diese Wertung nachvollziehbar. Insgesamt erreichen wir mit 24 von 30 Punkten (ausgenommen der \textit{Reviewer Confidence}) 80\% der Punktzahl, ein Ergebnis, mit dem wir zufrieden sein können.
+
+\begin{table}[]
+\centering
+\begin{tabular}{lr}
+\toprule
+\textbf{Kategorie}            & \textbf{Wertung}  \\
+\midrule
+Clarity                      & 5            \\
+Originality / Innovativeness & 4             \\
+Soundness / Correctness      & 4            \\
+Meaningful Comparison        & 4             \\
+Impact of Ideas or Results   & 3              \\
+Recommendation               & 4             \\
+\midrule
+Total (von 30)               & 24             \\
+\midrule
+Reviewer Confidence          & 5; 4          \\
+\bottomrule
+\end{tabular}
+\caption{Wertung der Gutachter auf einer Skala von 1 (schlechteste Wertung) bis 5 (beste Wertung). Beide Gutachter haben die gleichen Werte angegeben, nur die \textit{Reviewer Confidence} unterschied sich.}
+\label{tab:review}
+\end{table}
+
+\section{Hindernisse und was wir daraus gelernt haben}
 \label{sec:takeaway}
+Wir haben früh angefangen, ein System zu bauen, das erst mal nur \enquote{funktioniert}, und anschließend dieses System ausgebaut und verändert. Dies führte auch dazu, dass die Struktur des Codes zunehmend chaotisch wurde, da wir anfangs mehr Zeit in neue Funktionen investiert haben als in die Pflege des bestehenden Codes. Daher war es zu einem Zeitpunkt nötig, den kompletten Code umzustrukturieren und zu aktualisieren, was sehr zeitaufwändig war. Für künftige Projekte ist es daher ratsam, früh die Struktur, die man am Ende haben möchte, festzulegen und das Projekt gleich dementsprechend aufzubauen. Dazu gehören auch beispielsweise Ordnerstrukturen für Ausgabedateien verschiedener Art (generierte Daten, Logs, Backups, Evaluation, Grafiken).
 
 \section{Ausblick}
 \label{sec:future_work}
@@ -404,12 +589,13 @@ Enhancer:
 \end{itemize}
 
 \subsection{Weitere Anwendungsmöglichkeiten}
-Weitere Möglichkeiten das System anzuwenden, die man erforschen könnte:\todo{nötig/hilfreich? M}
+\todo[inline]{Weitere Möglichkeiten das System anzuwenden, die man erforschen könnte:
 \begin{itemize}
     \item Übersetzung
     \item Flexion von Sprachen mit sehr geringem Datensatz anhand anderer Sprachen aus derselben Familie
     \item Anwendung außerhalb der Sprache? Bspw. Chemie? 
 \end{itemize}
+}
 
 \bibliography{bib}
 \bibliographystyle{acl_natbib}
