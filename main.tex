@@ -274,6 +274,7 @@ Weitere Details zur Umsetzung der Baseline finden sich in der Beschreibung des S
 
 \subsection{Neuronales Netzwerk}
 \begin{figure}
+\centering
 \includegraphics[width=\linewidth]{architecture_de}
 \caption{System-Architektur}
 \label{fig:arch}
@@ -387,7 +388,7 @@ Aufgrund der relativ komplexen Implementierung des Beam-Decoding haben wir bis z
 Um die Ergebnisse unseres Systems zu verbessern, haben wir eine extensive Hyperparameter-Suche vorgenommen.
 Der zuvor geschilderte Aufbau des Systems ist dabei für alle Sprachen identisch.
 Je Sprache und Größe des Trainingsdatensatzes haben wir eine unabhängige Hyperparameter-Suche auf einer zufälligen Auswahl aus dem Such-Raster der Parameter durchgeführt.
-\autoref{tab:params} listet die Hyperparamter mitsamt ihrer möglichen Werte auf.
+\autoref{tab:params} listet die Hyperparameter mitsamt ihrer möglichen Werte auf.
 
 \begin{table}[]
     \centering
@@ -408,7 +409,18 @@ Je Sprache und Größe des Trainingsdatensatzes haben wir eine unabhängige Hype
 Während der Entwicklungsphase des Systems ist uns aufgefallen, dass die zufällige Initialisierung der Netzwerkgewichte großen Einfluss auf die Ergebnisse haben. Es handelt sich dabei um ein typisches Problem, welches insbesondere dann auftritt, wenn nur wenige Traningsdaten zur Verfügung stehen.
 Aus diesem Grund wird in unserer Hyperparamter-Suche jede Parameterkombination mit fünf verschiedenen Zufalls-Seeds durchlaufen, wodurch sowohl die Netzwerkgewichte andere Startwerte annehmen als auch die Reihenfolge der einzelnen Trainingsdatenpunkte variiert.
 
-Darüber hinaus konnten wir feststellen, dass unser System in der Vorhersage manchmal das Wort nicht mit \action{EOW} beendet und stattdessen endlos einen nicht existierenden Buchstaben des Lemmas mit \action{COPY} kopieren möchte oder aber ein beliebiges Zeichen mit \action{EMIT} andauernd wiederholt.
+Die Hyperparameter-Suche erstreckt sich insgesamt über 103 Sprachen, 3 Trainingsdatensätze, 3 GRU Größen, 2 Embedding Größen, 2 Patch-Zustände, 3 Enhancer-Stufen und 5 Zufalls-Seeds, was in $103 \times 3 \times 3 \times 2 \times 2 \times 3 \times 5 = 55.620$ Parameterkombinationen resultiert.
+Jeder einzelne Durchlauf erfordert ein vollständiges Training des neuronalen Netzwerkes sowie die Erzeugung der Ausgabedaten.
+Dies dauert in etwa ein bis drei Minuten für den kleinsten, zehn bis 20 Minuten für den mittleren und ein bis zwei Stunden für den größten Trainingsdatensatz.
+
+Da eine erschöpfende Suche von $55.620$ Parameterkombinationen zu viel Rechenzeit in Anspruch nähme, haben wir Möglichkeiten erkundet um die Anzahl zu reduzieren. Für den mittleren Trainingsdatensatz werden nur GRU und Embedding Größen getestet, die größer oder gleich dem besten Ergebnis auf dem kleinen Trainingsdatensatz sind.
+Analog dazu ist der große Datensatz ebenfalls in diesen beiden Parametern durch die besten Ergebnisse des mittleren Datensatzes beschränkt.
+Dies ist naheliegend, da mit steigenden Anzahl von Gewichten im neuronalen Netzwerk mehr Trainingsdaten benötigt werden, damit kein \textit{Overfitting} eintritt.
+Zusätzlich verwenden wir den Enhancer ausschließlich auf dem kleinen Trainingsdatensatz, da bereits das mittlere genügend Traningsexemplare enthält.
+Aus diesen reduzierten Parameterkombinationen wird je Sprache und Größe der Trainingsdaten eine zufällige Auswahl gezogen, um eine feste obere Grenze an Trainingsdurchläufen zu garantieren.
+Für die Abgabe der Ergebnisse für den Shared Task hat unsere Hyperparameter-Suche $9.278$ Trainingsläufe durchgeführt, was fast einer Reduktion auf ein Sechstel der ursprünglichen Menge entspricht.
+
+Während einer frühen Evaluation der Ergebnisse konnten wir feststellen, dass unser System in der Vorhersage manchmal das Wort nicht mit \action{EOW} beendet und stattdessen endlos einen nicht existierenden Buchstaben des Lemmas mit \action{COPY} kopieren möchte oder aber ein beliebiges Zeichen mit \action{EMIT} andauernd wiederholt.
 Daher enthält der String-Transduktor Maßnahmen um diese Probleme zu entschärfen.
 Wenn der Zeiger bereits über das Eingabewort hinaus bewegt wurde, greifen folgende Regelungen:
 Die Aktionen \action{COPY} und \action{PATCH} werden nicht mehr angewandt. Die \action{EMIT} Aktion kann das zuvor geschriebene Zeichen nicht erneut ausgeben. 
@@ -464,8 +476,10 @@ ua-02                      & 0                      & ua-01                     
 ua-01                      & 0                      & racai-01                   & 0                       & msu-01                     & 0         
 \\
 \bottomrule
+\multicolumn{6}{l}{\textit{0}: keine Einreichung des Teilnehmers. \textit{tueb.-oslo}: tuebingen-oslo, \textit{axsem.}: axsemantics}
 \end{tabular}
-\caption{Ergebnisse (Accuracy) aller Teilnehmer am Shared Task für alle Mengen.\\\textit{0}: keine Einreichung des Teilnehmers. \smaller{\textit{tueb.-oslo}: tuebingen-oslo, \textit{axsem.}: axsemantics.}}
+
+\caption{Ergebnisse (Accuracy) aller Teilnehmer am Shared Task für alle Mengen.}
 %Abrufbar unter: \url{https://docs.google.com/spreadsheets/d/1HqOGRyltYvji7pi-jq3swEfoWs15k5QU-lA3ua8dpmo/}
 \label{fig:results_all}
 \end{table}
@@ -485,7 +499,7 @@ Wir              & 77.5\% & 74,0\% & 40.3\% \\
 \label{fig:acc_comparison}
 \end{table}
 
-\begin{table}[htb]
+\begin{table}
 \centering
 \begin{tabular}{lrrr}
 \toprule
@@ -503,7 +517,9 @@ In \autoref{fig:results_all} sind die veröffentlichten Ergebnisse aller Teilneh
 
 Die beste Position (Position 8 von 21, oberen $38.1\%$) und die größte Verbesserung im Vergleich zur Baseline ($+12.15\%$) konnten wir mit einer Genauigkeit von $74.03\%$ auf der Menge \textit{medium} erreichen . Auf \textit{high} und \textit{low} lagen unsere Ergebnisse mit $77.53\%$ bzw. $40.28\%$ etwa $2\%$ über der Baseline und in den oberen $63.6\%$ beziehungsweise $40.7\%$ der eingereichten Ergebnisse.
 
-\autoref{tab:medium_averages} zeigt die 
+In Tabellen \ref{fig:acc_comparison} und \ref{fig:lev_comparison} sind unsere Ergebnisse nach Accuracy und Levenshtein im Vergleich zur Baseline sowie zum Durchschnitt der anderen Teilnehmern (nur Accuracy) aufgeführt. Wir konnten die durchschnittliche Accuracy der Teilnehmer auf \textit{medium} ($+13.0\%$) und \textit{low} ($+9.6\%$) schlagen. Die durchschnittliche Levenshtein-Distanz der Baseline konnten wir auf allen Mengen schlagen. Besonders auf \textit{medium} ($-0.39$) ist die Verbesserung mit $42.9\%$ deutlich, bei \textit{high} ($-0.07$, Verbesserung um $13.5\%$) und \textit{low} ($-0.39$, Verbesserung um $21.0\%$) weniger deutlich.
+
+\autoref{tab:langs_baseline} zeigt die Sprachen, die am Weitesten \textbf{über} und \textbf{unter} der Baseline lagen. In \autoref{sec:schwachstellen} werden die Schwachstellen des Systems beschrieben, die mit hoher Wahrscheinlichkeit zumindest zum Teil für die schlechten Ergebnisse auf manchen Sprachen verantwortlich sind.
 
 \begin{table}
 \centering
@@ -533,26 +549,63 @@ Die beste Position (Position 8 von 21, oberen $38.1\%$) und die größte Verbess
 \textbf{Über Baseline:} $73$  \quad \textbf{durchschn. Diff.:} $20.2$\\
 \textbf{Unter Baseline:} $29$ \quad \textbf{durchschn. Diff.:} $-7.7$
 \caption{Unsere Ergebnisse verglichen mit der Baseline. Sprachen am weitesten \textbf{über} und \textbf{unter} der Baseline, trainiert auf dem Training-Set \textit{medium} und evaluiert auf dem Test-Set.}
-\label{tab:medium_averages}
+\label{tab:langs_baseline}
 \end{table}
 
 
 \subsection{Effekt von Patches und Enhancer}
-
-
 \todo[inline]{Effekt von Patches}
 
 Auf die niedrige Datenmenge verbesserte der künstlich erweiterte Datensatz (bestes Ergebnis von \times 1 und \times 5) die Accuracy von 42 Datensätzen. Die Wahrscheinlichkeit, dass dies zufällige Beobachtungen sind, liegt bei $0.3049$ \citep{biostat:zar}. Der durchschnittliche Effekt über alle Sprachen beträgt $+1.3\%$, die maximale Verbesserung konnte mit $+10.8\%$ auf \lang{french} erreicht werden.
 
+\subsection{Effekt Beam-Decoding}
+\todo[inline]{Effekt des Beam-Decodings}
+
+\subsection{Schwachstellen}
+\label{sec:schwachstellen}
+Unser System weist mehrere Schwachstellen auf, von denen manche bewusste Architekturentscheidungen sind, andere jedoch aus einer suboptimalen Implementierung entstanden.
+
+% --- fehlerhafte Umsetzung
+So ist die Accuracy unseres Systems bei den Sprachen \lang{Neapolitan} und \lang{Haida} deutlich schlechter im Vergleich zu anderen Systemen und der Baseline wie \autoref{tab:langs_baseline} zeigt.
+Die Ursache dafür liegt in der fehlerhaften Nachverarbeitung des String-Transduktors.
+Der in \autoref{sec:tuning_evaluation} beschriebene Ausnahmefall beim Korrigieren fehlender \action{EOW}-Ausgaben des neuronalen Netzwerkes tritt für die Sprachen \lang{Neapolitan} und \lang{Haida} oft irrtümlicherweise auf.
+Das nachfolgende Beispiel aus dem Test-Datensatz zu \lang{Haida} zeigt, wie unser System in der Ausgabe ein Zeichen verschluckt, da der Transduktor die wiederholte \action{EMIT a} Aktion ignoriert, obwohl das neuronale Netzwerk in diesem Fall eine richtige Vorhersage gemacht hat:
+\begin{compactitem}
+	\item \texttt{ñíiyä} $\to$ \texttt{ñíiyä'wa\ } (Vorhersage)
+    \item \texttt{ñíiyä} $\to$ \texttt{ñíiyä'wa\textbf{a}} (Ziel)
+\end{compactitem}
+Solche und ähnliche Fehler treten vereinzelt in den meisten Sprachen auf -- doch in \lang{Neapolitan} und \lang{Haida} sind besonders viele Flexionen betroffen.
+Da sich Vorhersage und Ziel-Form jedoch meist nur um ein Zeichen unterscheiden, ist die Levenshtein-Distanz deutlich niedriger als die Accuracy auf den ersten Blick vermuten lässt.
+Während bei \lang{Haida} unser System eine deutlich geringere Accuracy als die Baseline liefert, schlägt unser System die Baseline auf dem gleichen Datensatz dennoch hinsichtlich der Levenshtein-Distanz.
+
+Die suboptimale Nachverarbeitung im Transduktor hat sich im Rückblick als sehr ärgerlicher Fehler herausgestellt.
+Wäre die Nachverarbeitung wie geplant nur dann aktiv geworden, wenn das neuronale Netzwerk gar kein \action{EOW} innerhalb der zulässigen Höchstlänge ausgibt, so hätte die Accuracy unseres Systems im Einklang zu den guten Levenshtein-Ergebnissen eine merkliche Verbesserung gezeigt.
+
+Noch besser wäre es hingegen auf die Nachverarbeitung in Gänze verzichten zu können. Eine Möglichkeit dazu ist die Verbesserung des Trainingsprozesses, indem ein dynamisches Orakel anstelle der statischen Ziel-Sequenz verwendet wird.
+Zusätzlich könnte noch globale Normalisierung bein Beam-Decoding eingesetzt werden.
+Die Anpassungen am Training des neuronalen Netzwerkes sollten die Probleme der bisherigen Netzwerkausgabe beheben, wodurch auf die fehlerhafte Nachverarbeitung vollständig verzichtet werden kann. 
+
+% --- bewusste Architekturentscheidungen
+Eine ganz andere Schwachstelle unseres Systems folgt aus bewusst getroffenen Architekturentscheidungen.
+So fällt es unserem System äußerst schwer Präfixe in Suffixe umzuwandeln und umgekehrt. Das folgende Beispiel aus dem Datensatz für \lang{German} verdeutlicht das Problem:
+\begin{compactitem}
+	\item \texttt{\underline{ab}stellen} $\to$ \texttt{stellt \underline{\ \ }} (Vorhersage)
+    \item \texttt{\underline{ab}stellen} $\to$ \texttt{stellt \underline{ab}} (Ziel)
+\end{compactitem}
+Das System ist nicht in der Lage den Präfix \texttt{ab} des Lemmas am Ende der Flexion anzufügen.
+Dies ist ein zu erwartendes Verhalten, da unser System die Repräsentationen der Buchstaben in monoton nacheinander bearbeitet ohne die Möglichkeit frei auf die verschiedenen Stellen des Lemmas zuzugreifen.
+Das neuronale Netzwerk müsste daher die Information des zu Beginn gelesenen Präfixes des Lemmas so lange im internen Zustand speichern bis diese am Ende der Flexion wieder ausgeben werden soll, da dem Decoder nicht gestattet ist erneut auf den Anfang des Lemmas zuzugreifen nachdem das Lemma bereits vollständig durchlaufen wurde.
+
+Um jenes Problem zu lösen, müsste der Decoder mittels \textit{soft-attention} freien Zugriff auf die gesamte Ausgabe des Encoders erhalten. Dadurch wäre jedoch eine erfolgreiche Anwendung der \action{COPY} und \action{PATCH} Aktionen auf dem Lemma nicht mehr gegeben, was jedoch den Kern unseres Systems ausmacht.
 
 \section{Teilnahme am Shared Task und Paper}
 \label{sec:paper}
 \todo{besser benennen}
 \todo[inline]{Hier können wir schreiben, wie wir am Shared Task teilgenommen haben (Wann wir die Daten bekommen haben, wann wir was abgegeben haben etc.), statt es wie in der Präsentation etwas zu verteilen. Und eben über das Paper berichten. Können das aber wieder trennen oder die Teilnahme-Details ganz weglassen.}
 
-Pünktlich zur Frist der ersten Abgabe haben wir den ersten Entwurf des Papers anonymisiert am 15. August 2018 eingereicht. Das Paper hat acht Seiten plus Bibliographie. Am 23. August 2018 haben wir die Nachricht bekommen, dass das Paper akzeptiert wurde, sowie das Feedback zweier anonymer Kritiker. Dieses beinhaltete unter anderem, dass das Paper \enquote{verständlich geschrieben} sei, mehr Experimente zum Effekt der Patches nötig seien, weitere Zitate für den Enhancer sowie den Hinweis auf Unicode NDF-Dekomposition. Außerdem haben beide Gutachter das Paper nach bestimmten Kriterien bewertet, siehe Tabelle \ref{tab:review}. Beide Reviewer haben dabei die gleichen Wertungen abgegeben, nur die \textit{Reviewer Confidence} unterschied sich bei den beiden Gutachtern. Mit der maximalen Punktzahl wurde die Klarheit des Papers bewertet. Mit einer Wertung von 3 wurde der \textit{Impact of Ideas or Results} am schlechtesten bewertet. Da sich unser System nicht deutlich von anderen System oder bisherigen Ergebnissen absetzen kann, ist diese Wertung nachvollziehbar. Insgesamt erreichen wir mit 24 von 30 Punkten (ausgenommen der \textit{Reviewer Confidence}) 80\% der Punktzahl, ein Ergebnis, mit dem wir zufrieden sein können.
+Pünktlich zur Frist der ersten Abgabe haben wir den ersten Entwurf des Papers anonymisiert am 15. August 2018 eingereicht. Das Paper \enquote{Finding the way from ä to a: Sub-character morphological inflection for the SIGMORPHON 2018 Shared Task}\footnote{abrufbar unter \url{https://arxiv.org/abs/1809.05742}} ist acht Seiten lang plus Bibliographie. Am 23. August 2018 haben wir die Nachricht bekommen, dass das Paper akzeptiert wurde, sowie das Feedback zweier anonymer Kritiker erhalten. Dieses beinhaltete unter anderem, dass das Paper \enquote{verständlich geschrieben} sei, mehr Experimente zum Effekt der Patches nötig seien, weitere Zitate für den Enhancer sowie den Hinweis auf Unicode NDF-Dekomposition. Außerdem haben beide Gutachter das Paper nach bestimmten Kriterien bewertet, siehe Tabelle \ref{tab:review}. Beide Reviewer haben dabei die gleichen Wertungen abgegeben, nur die \textit{Reviewer Confidence} unterschied sich bei den beiden Gutachtern. Mit der maximalen Punktzahl wurde die Klarheit des Papers bewertet. Mit einer Wertung von 3 wurde der \textit{Impact of Ideas or Results} am schlechtesten bewertet. Da sich unser System nicht deutlich von anderen System oder bisherigen Ergebnissen absetzen kann, ist diese Wertung nachvollziehbar. Insgesamt erreichen wir mit 24 von 30 Punkten (ausgenommen der \textit{Reviewer Confidence}) 80\% der Punktzahl, ein Ergebnis, mit dem wir sehr zufrieden sind.
 
-\begin{table}[]
+\begin{table}
 \centering
 \begin{tabular}{lr}
 \toprule
@@ -578,24 +631,36 @@ Reviewer Confidence          & 5; 4          \\
 \label{sec:takeaway}
 Wir haben früh angefangen, ein System zu bauen, das erst mal nur \enquote{funktioniert}, und anschließend dieses System ausgebaut und verändert. Dies führte auch dazu, dass die Struktur des Codes zunehmend chaotisch wurde, da wir anfangs mehr Zeit in neue Funktionen investiert haben als in die Pflege des bestehenden Codes. Daher war es zu einem Zeitpunkt nötig, den kompletten Code umzustrukturieren und zu aktualisieren, was sehr zeitaufwändig war. Für künftige Projekte ist es daher ratsam, früh die Struktur, die man am Ende haben möchte, festzulegen und das Projekt gleich dementsprechend aufzubauen. Dazu gehören auch beispielsweise Ordnerstrukturen für Ausgabedateien verschiedener Art (generierte Daten, Logs, Backups, Evaluation, Grafiken).
 
+Außerdem haben wir im fortgeschrittenen Stadium des Projekts Probleme, die Logs, die beim Evaluieren der unseres Outputs erstellt wurden, korrekt einzulesen, da wir hier nicht frühzeitig ein einheitliches Format festgesetzt haben. Verschiedene Komponenten haben verschiedene Logs erstellt, die nachträglich vereinheitlicht werden mussten. Dadurch hatten wir später keine Probleme mehr diese Logs zu verarbeiten.
+
+Darüber hinaus haben wir gelernt, wie wichtig Automatisierung ist. Da wir unser System auf mehreren Rechnern verteilt laufen lassen haben, haben wir Skripte genutzt, die diese aufrufen und die Ergebnisse wieder einsammeln. Weitere Automatisierung hat die Ergebnisse schließlich zusammengeführt und auch die Auswertung sowie Erstellen von Grafiken mussten nicht mehr manuell gemacht werden.
+
+Eine weitere wichtige Erfahrung ist, wie wichtig Zeitpuffer und Alternativpläne sind, um auf mögliche Probleme vorbereitet zu sein. Beispielsweise haben wir unsere finale Ergebnisse relativ kurz vor Ablauf der ersten Frist inmitten einer Hitzewelle in Hamburg laufen lassen, was zur Folge hatte, dass die Server, die wir nutzen wollten, wegen eines Ausfalls der Kühlungsanlage abgeschaltet wurden. Wir mussten daher kurzzeitig auf andere, weniger starke Server ausweichen.
+\quotation{[hummel-users] The sun is killing us (operations down due to cooling system failure).}
+    
 \section{Ausblick}
 \label{sec:future_work}
 \subsection{Mögliche Verbesserungen}
-Enhancer:
-\begin{itemize}
-    \item besseres Sprachmodell
-    \item besondere Behandlung von Prä- und Suffixen
-    \item Effizienz steigern (statt von $n=5$ abwärts von $n=0$ aufwärts suchen
-\end{itemize}
+
+Zum Einen können die neuen Features, also die Patches und der Enhancer, verbessert werden.
+\todo[inline]{Patches verbessern: verschiedene Schriftarten, mehr Sprachen abdecken}
+
+Der Enhancer könnte ein besseres Sprachmodell benutzen. Denkbar wäre beispielsweise eine besondere Behandlung von Prä- und Suffixen, eine  bessere Erkennung typischer Silben oder n-Gramme und das Verhindern von untypischen Buchstabenkombinationen.
+
+Auch am Transduktor und am Netzwerk können weitere Verbesserungen vorgenommen werden.
+\todo[inline]{Verbesserungen am Transduktor und Netzwerk:\\
+Keine \enquote{Hacks} für Netzwerkausgabe\\
+Einfach: Vernünftige Nachverarbeitung\\
+Optimal: Dynamisches Orakel statt statische Ziel-Sequenz\\
+}
+
+Letztendlich sollten weitere Parameterkombinationen getestet werden, um die Beste Kombination zu finden. Auch bisher ungetestete Werte für die einzelnen Parameter sollten in Betracht gezogen werden.
 
 \subsection{Weitere Anwendungsmöglichkeiten}
-\todo[inline]{Weitere Möglichkeiten das System anzuwenden, die man erforschen könnte:
-\begin{itemize}
-    \item Übersetzung
-    \item Flexion von Sprachen mit sehr geringem Datensatz anhand anderer Sprachen aus derselben Familie
-    \item Anwendung außerhalb der Sprache? Bspw. Chemie? 
-\end{itemize}
-}
+
+Darüber hinaus wäre es interessant, welche weiteren Möglichkeiten der Anwendung man abseits der Aufgabe erforschen könnte. Beispielsweise könnte man erforschen, ob es einen Zugewinn an Genauigkeit gibt, wenn man das System auf mehr als einer Sprache trainiert. Denkbar wäre es, hier die Sprache als weiteres Feature anzuhängen, sowie entweder nur auf Sprachen derselben Familie zu trainieren, oder Sprachfamilie und gegebenenfalls andere Eigenschaften der Sprache als Features anzugeben. Unter der Annahme, dass Flexionen innerhalb einer Sprachfamilie ähnlich verlaufen, könnten so aus anderen Sprachen korrekte Regeln gelernt werden.  So könnten Sprachen mit nur geringen Daten trotzdem relativ gut flektiert werden, sofern andere Sprachen derselben Sprachfamilie bekannt sind.
+
+Eine weitere denkbare Anwendung ist die Übersetzung. Dies würde wahrscheinlich größere Anpassungen am System voraussetzen. Übersetzungen innerhalb einer Sprachfamilie sind hier wahrscheinlich erfolgreicher als übergreifend über zwei Familien. Auch mögliche Anwendungen außerhalb der Linguistik, wie beispielsweise chemische Formeln, können erforscht werden.
 
 \bibliography{bib}
 \bibliographystyle{acl_natbib}
