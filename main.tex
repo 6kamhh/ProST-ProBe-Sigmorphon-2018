@@ -1,12 +1,12 @@
-\documentclass[a4paper]{article}
+\documentclass[11pt,a4paper]{article}
 
+\usepackage{latexsym}
 \usepackage[german]{babel}
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath}
 \usepackage{graphicx}
 \usepackage[colorinlistoftodos]{todonotes}
 \usepackage{natbib}
-
 \usepackage{multirow}
 \usepackage{url}
 \usepackage{microtype}
@@ -20,13 +20,15 @@
 \usepackage{algorithm}
 \usepackage{algorithmic}
 \usepackage[skip=4pt]{caption}
-\usepackage{hyperref}
+\usepackage[hyperref]{acl2018}
 \usepackage{rotating}
 \usepackage{afterpage}
 \usepackage{pdflscape}
 
 \newcommand{\lang}[1]{\textit{#1}}
 \newcommand{\action}[1]{\texttt{#1}}
+
+%\aclfinalcopy
 
 \title{Projekt Sprachtechnologie\\Projektbericht}
 
@@ -54,7 +56,7 @@ Die Arbeit entstand als Teil des \textit{CoNLL--SIGMORPHON 2018 Shared Task} von
 \centering
 \begin{tabular}{lrr}
 \toprule
-& \multicolumn{2}{c}{Anzahl von Trainingsexemplaren}\\ \cmidrule{2-3}
+& \multicolumn{2}{c}{Anzahl Trainingsexemplare}\\ \cmidrule{2-3}
 Volumen & Maximum & Durchschnitt\\
 \midrule
 low & 100 & 99.6\\
@@ -73,7 +75,7 @@ high & 10.000 & 8553.6\\
 Lemma & Flexion & Features\\
 \midrule
 Baumhaus & Baumhäuser & N;ACC;PL\\
-Kanarienvogel & Kanarienvögeln & N;DAT;PL\\
+Vogel & Vögeln & N;DAT;PL\\
 Milchkuh & Milchkühen & N;DAT;PL\\
 \bottomrule
 \end{tabular}
@@ -171,7 +173,7 @@ Um schlussendlich aus einem Alignment zwischen Lemma und flektierter Form auch e
 \STATE $actions$.append(\action{EOW})
 \RETURN{$actions$}
 \end{algorithmic}
-\caption{Erstellen der Orakel-Aktionskette aus alignierten Eingabestrings}
+\caption{Erstellen der Aktionskette aus alignierten Eingabestrings}
 \label{alg:oracle}
 \end{algorithm}
 
@@ -237,7 +239,7 @@ $\Downarrow$ & $\Downarrow$\\
 \centering
 \begin{tabular}{lccc}
 \toprule
-N-Gramm & Buchstabe & Frequenz & p\\ \midrule
+N-Gramm & Zeichen & Frequenz & p\\ \midrule
  \texttt{?ad} & r & $433$ & $0.4446$ \\
  & p & $182$ & $0.1869$\\
  & t & $107$ & $0.1099$\\ 
@@ -320,16 +322,22 @@ Falls Aktionen den Index-Zeiger über die Länge des Lemmas hinaus schieben wür
 %\end{sidewaysfigure}
 
 % dreht eine ganze Seite
-\afterpage{
-\begin{landscape}
-  \begin{figure}[htbp]
+%\afterpage{
+%\begin{landscape}
+%  \begin{figure}[htbp]
+%  \centering
+%    \includegraphics[width=\linewidth, height=\textheight,keepaspectratio]{beam_search}
+%    \caption{Beispielhafter Beamsearch Decoding-Prozess von Haus zu Häuser mit Beam-Anzahl 2}
+%    \label{fig:beam}
+%  \end{figure}
+%\end{landscape}
+%}
+\begin{sidewaysfigure*}[htbp]
   \centering
-    \includegraphics[width=\linewidth, height=\textheight,keepaspectratio]{beam_search}
-    \caption{Beispielhafter Beamsearch Decoding-Prozess von Haus zu Häuser mit Beam-Anzahl 2}
-    \label{fig:beam}
-  \end{figure}
-\end{landscape}
-}
+  \includegraphics[width=\textwidth-\baselineskip-\abovecaptionskip-\belowcaptionskip,keepaspectratio]{beam_search}
+  \caption{Beispielhafter Beamsearch Decoding-Prozess von Haus zu Häuser mit Beam-Anzahl 2}
+  \label{fig:beam}
+\end{sidewaysfigure*}
 
 Um die Vorhersagegenauigkeit unseres Systems zu verbessern, haben wir Beamsearch in den Decoding-Prozess eingebaut.
 Dies resultiert in mehreren Pfaden, von denen der Pfad mit der größten Wahrscheinlichkeit ausgewählt wird, um das finale flektierte Ausgabewort zu erstellen.
@@ -410,16 +418,12 @@ Aufgrund der relativ komplexen Implementierung des Beam-Decoding haben wir bis z
 
 \section{Feinabstimmung und Evaluation}
 \label{sec:tuning_evaluation}
-Um die Ergebnisse unseres Systems zu verbessern, haben wir eine extensive Hyperparameter-Suche vorgenommen.
-Der zuvor geschilderte Aufbau des Systems ist dabei für alle Sprachen identisch.
-Je Sprache und Größe des Trainingsdatensatzes haben wir eine unabhängige Hyperparameter-Suche auf einer zufälligen Auswahl aus dem Such-Raster der Parameter durchgeführt.
-\autoref{tab:params} listet die Hyperparameter mitsamt ihrer möglichen Werte auf.
 
-\begin{table}[]
+\begin{table*}[htb]
     \centering
     \begin{tabularx}{\textwidth}{lcX}
     \toprule
-    \textbf{Parameter} & \textbf{Werte} & \textbf{Beschreibung}\\
+    Parameter & Werte & Beschreibung\\
     \midrule
         GRU Größe & 32, 64, 128 & Tensor Größe des internen Zustands von Encoder \& Decoder\\
         Embedding Größe & 8, 16 & Tensor Größe der Zeichen-Embeddings\\
@@ -429,7 +433,12 @@ Je Sprache und Größe des Trainingsdatensatzes haben wir eine unabhängige Hype
     \end{tabularx}
     \caption{Hyperparameter}
     \label{tab:params}
-\end{table}
+\end{table*}
+
+Um die Ergebnisse unseres Systems zu verbessern, haben wir eine extensive Hyperparameter-Suche vorgenommen.
+Der zuvor geschilderte Aufbau des Systems ist dabei für alle Sprachen identisch.
+Je Sprache und Größe des Trainingsdatensatzes haben wir eine unabhängige Hyperparameter-Suche auf einer zufälligen Auswahl aus dem Such-Raster der Parameter durchgeführt.
+\autoref{tab:params} listet die Hyperparameter mitsamt ihrer möglichen Werte auf.
 
 Während der Entwicklungsphase des Systems ist uns aufgefallen, dass die zufällige Initialisierung der Netzwerkgewichte großen Einfluss auf die Ergebnisse haben. Es handelt sich dabei um ein typisches Problem, welches insbesondere dann auftritt, wenn nur wenige Traningsdaten zur Verfügung stehen.
 Aus diesem Grund wird in unserer Hyperparamter-Suche jede Parameterkombination mit fünf verschiedenen Zufalls-Seeds durchlaufen, wodurch sowohl die Netzwerkgewichte andere Startwerte annehmen als auch die Reihenfolge der einzelnen Trainingsdatenpunkte variiert.
@@ -451,7 +460,7 @@ Wenn der Zeiger bereits über das Eingabewort hinaus bewegt wurde, greifen folge
 Die Aktionen \action{COPY} und \action{PATCH} werden nicht mehr angewandt. Die \action{EMIT} Aktion kann das zuvor geschriebene Zeichen nicht erneut ausgeben. 
 Dadurch können jedoch die flektierten Formen in einigen Ausnahmefällen einzelne Zeichen am Ende vermissen. 
 
-Für die finale Evaluation der Test-Datensätze haben wir die beste Parameterkombination (inklusive Zufalls-Seed) für ein jedes Paar aus Sprache und Größe des Trainingsdatensatzes auf Basis der Levenshtein-Distanz der Ergebnisse auf dem bereitgestellten Entwicklungsdatensatz verwendet.
+Für die finale Evaluation der Testdatensätze haben wir die beste Parameterkombination (inklusive Zufalls-Seed) für ein jedes Paar aus Sprache und Größe des Trainingsdatensatzes auf Basis der Levenshtein-Distanz der Ergebnisse auf dem bereitgestellten Entwicklungsdatensatz verwendet.
 
 
 \section{Ergebnisse und Diskussion}
@@ -460,14 +469,14 @@ Für die finale Evaluation der Test-Datensätze haben wir die beste Parameterkom
 \subsection{Eingereichte Ergebnisse}
 \label{sec:eingereichte_ergebnisse}
 
-\begin{table}
-\small
+\begin{table*}[tbh]
+%\small
 \centering
 \begin{tabular}{lr|lr|lr}
 \toprule
 \textbf{high}             & & \textbf{medium}                 &  & \textbf{low}                  &  \\
 \midrule
-\textbf{Teilnehmer}                & \textbf{Accuracy}               & \textbf{Teilnehmer}                & \textbf{Accuracy}                & \textbf{Teilnehmer}                & \textbf{Accuracy}
+Teilnehmer                 & Accuracy                    & Teilnehmer                & Accuracy                      & Teilnehmer                & Accuracy
 \\
 \rule{0pt}{3ex}uzh-01                     & 96                     & uzh-01                     & 86.64                   & uzh-02                     & 57.21                  \\
 uzh-02                     & 95.97                  & uzh-02                     & 86.38                   & uzh-01                     & 57.18                  \\
@@ -480,34 +489,34 @@ msu-04                     & 91.87                  & \textbf{hamburg-01}       
 iit-varanasi-01            & 91.73                  & iit-varanasi-01            & 70.17                   & waseda-01                  & 44.09                  \\
 waseda-01                  & 91.12                  & msu-02                     & 69.45                   & msu-02                     & 41.61                  \\
 msu-03                     & 90.52                  & bme-01                     & 67.43                   & \textbf{hamburg-01}        & \textbf{40.28}         \\
-axsem.-01             & 84.19                  & bme-03                     & 67.36                   & ua-02                      & 39.19                  \\
+axsemantics-01             & 84.19                  & bme-03                     & 67.36                   & ua-02                      & 39.19                  \\
 msu-02                     & 82.68                  & bme-02                     & 67.26                   & ua-01                      & 38.22                  \\
 \textbf{hamburg-01}        & \textbf{77.53}         & \textit{\textbf{baseline}} & \textit{\textbf{61.78}} & \textit{\textbf{baseline}} & \textit{\textbf{38.2}} \\
-\textit{\textbf{baseline}} & \textit{\textbf{75.3}} & axsem.-02             & 60                      & ua-07                      & 37.99                  \\
-axsem.-02             & 74.77                  & msu-01                     & 54.44                   & msu-04                     & 31.4                   \\
-msu-01                     & 74.33                  & tueb.-oslo-03          & 30.98                   & msu-03                     & 25.86                  \\
-racai-01                   & 72.49                  & tueb.-oslo-02          & 29.72                   & iit-varanasi-01            & 23.33                  \\
-tueb.-oslo-03          & 63.05                  & kucst-01                   & 29.12                   & ua-04                      & 21.25                  \\
-tueb.-oslo-02          & 56.6                   & tueb.-oslo-01          & 20.97                   & axsem.-02             & 14.74                  \\
-tueb.-oslo-01          & 49.52                  & axsem.-01             & 9.1                     & tueb.-oslo-02          & 4.43                   \\
+\textit{\textbf{baseline}} & \textit{\textbf{75.3}} & axsemantics-02             & 60                      & ua-07                      & 37.99                  \\
+axsemantics-02             & 74.77                  & msu-01                     & 54.44                   & msu-04                     & 31.4                   \\
+msu-01                     & 74.33                  & tuebingen-oslo-03          & 30.98                   & msu-03                     & 25.86                  \\
+racai-01                   & 72.49                  & tuebingen-oslo-02          & 29.72                   & iit-varanasi-01            & 23.33                  \\
+tuebingen-oslo-03          & 63.05                  & kucst-01                   & 29.12                   & ua-04                      & 21.25                  \\
+tuebingen-oslo-02          & 56.6                   & tuebingen-oslo-01          & 20.97                   & axsemantics-02             & 14.74                  \\
+tuebingen-oslo-01          & 49.52                  & axsemantics-01             & 9.1                     & tuebingen-oslo-02          & 4.43                   \\
 kucst-01                   & 48.68                  & ua-08                      & 0                       & bme-01                     & 3.74                   \\
 ua-08                      & 0                      & ua-07                      & 0                       & bme-03                     & 3.63                   \\
 ua-07                      & 0                      & ua-06                      & 0                       & kucst-01                   & 2.52                   \\
 ua-06                      & 0                      & ua-05                      & 0                       & bme-02                     & 2.43                   \\
-ua-05                      & 0                      & ua-04                      & 0                       & tueb.-oslo-03          & 1.39                   \\
-ua-04                      & 0                      & ua-03                      & 0                       & axsem.-01             & 0.7                    \\
-ua-03                      & 0                      & ua-02                      & 0                       & tueb.-oslo-01          & 0                      \\
+ua-05                      & 0                      & ua-04                      & 0                       & tuebingen-oslo-03          & 1.39                   \\
+ua-04                      & 0                      & ua-03                      & 0                       & axsemantics-01             & 0.7                    \\
+ua-03                      & 0                      & ua-02                      & 0                       & tuebingen-oslo-01          & 0                      \\
 ua-02                      & 0                      & ua-01                      & 0                       & racai-01                   & 0                      \\
 ua-01                      & 0                      & racai-01                   & 0                       & msu-01                     & 0         
 \\
 \bottomrule
-\multicolumn{6}{l}{\textit{0}: keine Einreichung des Teilnehmers. \textit{tueb.-oslo}: tuebingen-oslo, \textit{axsem.}: axsemantics}
+\multicolumn{6}{l}{$0$: keine Einreichung des Teilnehmers}
 \end{tabular}
 
 \caption{Ergebnisse (Accuracy) aller Teilnehmer am Shared Task für alle Mengen.}
 %Abrufbar unter: \url{https://docs.google.com/spreadsheets/d/1HqOGRyltYvji7pi-jq3swEfoWs15k5QU-lA3ua8dpmo/}
 \label{fig:results_all}
-\end{table}
+\end{table*}
 
 \begin{table}
 \centering
@@ -552,11 +561,11 @@ In Tabellen \ref{fig:acc_comparison} und \ref{fig:lev_comparison} sind unsere Er
 \begin{tabular}{llrr}
   \toprule
                            & \textbf{Sprachen}  &\textbf{Wir} & \textbf{BL} \\
-\midrule\textbf{Beste Sprachen}   & Uzbek              & $100.0$      & $96.0$ \\
+\midrule\textbf{Beste}   & Uzbek              & $100.0$      & $96.0$ \\
                            & Mapudungun         & $100.0$      & $82.0$ \\
                            & Classical-Syriac   & $97.0$       & $99.0$ \\
 %\midrule
-\textbf{Schlechteste Sprachen}         & Old-Irish          & $6.0$        & $16.0$ \\
+\textbf{Schlechteste}         & Old-Irish          & $6.0$        & $16.0$ \\
                            & Haida              & $16.1$       & $61.0$ \\
                            & Latin              & $21.4$       & $37.6$ \\
 %\midrule
@@ -585,7 +594,27 @@ Auf die niedrige Datenmenge verbesserte der künstlich erweiterte Datensatz (bes
 
 \subsection{Effekt Beam-Decoding}
 \label{sec:beam-results}
-\todo[inline]{Effekt des Beam-Decodings}
+
+\begin{figure}
+\centering
+\includegraphics{beamlow}
+\caption{Histogramm, welches den Effekt von Beam-Größe 16 im Vergleich zu Größe 1 auf dem Test-Datensatz zeigt (Trainiert auf dem kleinsten Datensatz)
+\todo[inline]{Bild Beschriftung auf Deutsch}
+}
+\label{fig:histBeamLowAcc}
+\end{figure}
+
+Auch wenn wir Beam-Decoding für die Einreichung der Daten zum Shared Task nicht verwendet haben, so haben wir im Nachgang Experimente hinsichtlich der Veränderung der Evaluationsergebnisse durchgeführt.
+\autoref{fig:histBeamLowAcc} zeigt für wie viele Sprachen ein Unterschied hinsichtlich der Accuracy durch Beam-Decoding mit einer Größe von 16 im Vergleich zu deaktivierten Beam-Decoding auftritt.
+Knapp die Hälfte der Sprachen zeigt keine oder nur minimale Veränderungen der Accuracy durch Beam-Decoding.
+Etwa ein Drittel der Sprachen weist eine leichte Verbesserung der Accuracy zwischen $1,3$ und $3,9$ auf.
+Während bei einigen Sprachen sogar ein noch stärkerer Anstieg der Accuracy auftritt, zeigen nur wenige Sprachen eine minimale Verschlechterung durch Beam-Decoding.
+
+Über alle Sprachen gemittelt führt der Einsatz von Beam-Decoding mit Größe 16 zu einer Erhöhung der Accuracy von 4\%.
+% A binomial test shows that the probability of the increase being random is as low as $2.4 \times 10^{-10}$. Beam-decoding therefore clearly leads to an increase in accuracy which matches the intuition of beam-decoding producing better or equal results compared to greedy decoding.
+Ein Binomialtest zur Prüfung, ob es sich ausschließlich um zufällige Erhöhungen handelt, weist im Ergebnis eine Wahrscheinlichkeit von nur $2.4 \times 10^{-10}$ auf.
+Daher führt Beam-Decoding zu einem merklichen Anstieg der Accuracy, was auch mit der Intuition übereinstimmt, dass Beam-Decoding nur bessere oder gleiche Ergebnisse im Vergleich zu \textit{greedy decoding} liefert.
+
 
 \subsection{Schwachstellen}
 \label{sec:schwachstellen}
@@ -597,8 +626,8 @@ Die Ursache dafür liegt in der fehlerhaften Nachverarbeitung des String-Transdu
 Der in \autoref{sec:tuning_evaluation} beschriebene Ausnahmefall beim Korrigieren fehlender \action{EOW}-Ausgaben des neuronalen Netzwerkes tritt für die Sprachen \lang{Neapolitan} und \lang{Haida} oft irrtümlicherweise auf.
 Das nachfolgende Beispiel aus dem Test-Datensatz zu \lang{Haida} zeigt, wie unser System in der Ausgabe ein Zeichen verschluckt, da der Transduktor die wiederholte \action{EMIT a} Aktion ignoriert, obwohl das neuronale Netzwerk in diesem Fall eine richtige Vorhersage gemacht hat:
 \begin{compactitem}
-	\item \texttt{ñíiyä} $\to$ \texttt{ñíiyä'wa\ } (Vorhersage)
-    \item \texttt{ñíiyä} $\to$ \texttt{ñíiyä'wa\textbf{a}} (Ziel)
+	\item \texttt{ñíiyä} $\to$ \texttt{ñíiyä'wa\underline{\ }} (Vorhersage)
+    \item \texttt{ñíiyä} $\to$ \texttt{ñíiyä'wa\underline{a}} (Ziel)
 \end{compactitem}
 Solche und ähnliche Fehler treten vereinzelt in den meisten Sprachen auf -- doch in \lang{Neapolitan} und \lang{Haida} sind besonders viele Flexionen betroffen.
 Da sich Vorhersage und Ziel-Form jedoch meist nur um ein Zeichen unterscheiden, ist die Levenshtein-Distanz deutlich niedriger als die Accuracy auf den ersten Blick vermuten lässt.
@@ -662,8 +691,10 @@ Außerdem haben wir im fortgeschrittenen Stadium des Projekts Probleme, die Logs
 Darüber hinaus haben wir gelernt, wie wichtig Automatisierung ist. Da wir unser System auf mehreren Rechnern verteilt laufen lassen haben, haben wir Skripte genutzt, die diese aufrufen und die Ergebnisse wieder einsammeln. Weitere Automatisierung hat die Ergebnisse schließlich zusammengeführt und auch die Auswertung sowie Erstellen von Grafiken mussten nicht mehr manuell gemacht werden.
 
 Eine weitere wichtige Erfahrung ist, wie wichtig Zeitpuffer und Alternativpläne sind, um auf mögliche Probleme vorbereitet zu sein. Beispielsweise haben wir unsere finale Ergebnisse relativ kurz vor Ablauf der ersten Frist inmitten einer Hitzewelle in Hamburg laufen lassen, was zur Folge hatte, dass die Server, die wir nutzen wollten, wegen eines Ausfalls der Kühlungsanlage abgeschaltet wurden. Wir mussten daher kurzzeitig auf andere, weniger leistungsstarke Server ausweichen.
-\quotation{[hummel-users] The sun is killing us (operations down due to cooling system failure).}
-    
+\begin{quote}
+[hummel-users] The sun is killing us (operations down due to cooling system failure)
+\end{quote}
+
 \section{Ausblick}
 \label{sec:future_work}
 \subsection{Mögliche Verbesserungen}
