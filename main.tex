@@ -28,11 +28,11 @@
 \newcommand{\lang}[1]{\textit{#1}}
 \newcommand{\action}[1]{\texttt{#1}}
 
-%\aclfinalcopy
+\aclfinalcopy
 
 \title{Projekt Sprachtechnologie\\Projektbericht}
 
-\author{Fynn Schröder\qquad (7003971)\\Marcel Kamlot\qquad Matr.Nr\\Gregor Billing\qquad(6808038)}
+\author{Fynn Schröder\qquad (7003971)\\Marcel Kamlot\qquad(6208685)\\Gregor Billing\qquad(6808038)}
 
 \date{20.09.2018}
 
@@ -40,7 +40,7 @@
 \maketitle
 
 \begin{abstract}
-Toller Kram\todo[inline]{todo}
+\todo[inline]{Abstrakte Zusammenfassung des Inhalts (in gewisser Weise auf Meta-Ebene). Vorwegnahme der "Ergebnisse", wenn möglich}
 \end{abstract}
 
 \section{Einleitung und Aufgabenstellung}
@@ -50,21 +50,21 @@ Andere Sprachen können jedoch anderen Flexionsparadigma unterliegen, und so wur
 
 \subsection{SIGMORPHON Shared Task}
 \label{sec:sub:shared_task}
-Die Arbeit entstand als Teil des \textit{CoNLL--SIGMORPHON 2018 Shared Task} von \citet{sigmorphon:st2018}. Er besteht aus zwei Aufgaben.  Für Aufgabe 1 wurden von der SIGMORPHON-Gruppe annotierte Daten in über 100 Sprachen veröffentlicht. Diese folgen dem UniMorph-Annotationsschema \citep{kirov:unimorph2018} und sind jeweils in bis zu drei verschieden großen Mengen \todo{bessere Bezeichnung finden} verfügbar, siehe \autoref{fig:training-volumes}. Sie bestehen pro Beispiel aus je einer Grundform (\textit{Lemma}), der flektierten Form (\textit{Flexion}) sowie den Eigenschaften (\textit{Features}) der flektierten Form; in \autoref{fig:german-declension} sind deutsche Beispiele dargestellt. Aufgabe ist es aus gegebenen Lemma und Features die Flexion zu generieren.
+Die Arbeit entstand als Teil des \textit{CoNLL--SIGMORPHON 2018 Shared Task} von \citet{sigmorphon:st2018}. Er besteht aus zwei Aufgaben.  Für Aufgabe 1 wurden von der SIGMORPHON annotierte Daten in über 100 Sprachen veröffentlicht. Diese folgen dem UniMorph-Annotationsschema \citep{kirov:unimorph2018} und sind jeweils in bis zu drei verschieden Größenordnungen verfügbar, siehe \autoref{fig:training-volumes}. Sie bestehen pro Beispiel aus je einer Grundform (\textit{Lemma}), der flektierten Form (\textit{Flexion}) sowie den Eigenschaften (\textit{Features}) der flektierten Form; in \autoref{fig:german-declension} sind deutsche Beispiele dargestellt. Aufgabe ist es aus gegebenen Lemma und Features die Flexion zu generieren.
 
 \begin{table}[htb]
 \centering
 \begin{tabular}{lrr}
 \toprule
-& \multicolumn{2}{c}{Anzahl Trainingsexemplare}\\ \cmidrule{2-3}
-Volumen & Maximum & Durchschnitt\\
+%& \multicolumn{2}{c}{Anzahl Trainingsexemplare}\\ \cmidrule{2-3}
+Bezeichnung & Maximum & Durchschnitt\\
 \midrule
 low & 100 & 99.6\\
 medium & 1.000 & 934.5\\
 high & 10.000 & 8553.6\\
 \bottomrule
 \end{tabular}
-\caption{Anzahl der Trainingsdaten je Volumen}
+\caption{Anzahl der Trainingspaare je Datensatz}
 \label{fig:training-volumes}
 \end{table}
 
@@ -99,7 +99,11 @@ Aufgabe 2 wurde von uns nicht bearbeitet. Sie behandelt Flexion im Kontext: In e
 \section{Herangehensweise}
 \label{sec:approach}
 
-Die Flexion als solche unterliegt als morphologischer Prozess den grundlegenden Wortbildungsprozessen mit Affixen\todo{Beleg?}. Wörter in ihrer Grundform werden in Wortstamm und Präfixe, Suffixe, Infixe und Zirkumfixe aufgeteilt, und die einzelnen Bestandteile werden wiederum angepasst. \todo{Tabelle vom Paper rüberholen}\todo[inline]{Nicht so sehr auf Affixe fixieren (also relativieren!), oder belegen, dass das für alle Sprachen gilt, sonst verabschieden wir uns von der Sprach-Unabhängigkeit. M}
+Die Flexion als solche unterliegt als morphologischer Prozess in vielen Sprachen den grundlegenden Wortbildungsprozessen mit Affixen.
+Wörter in ihrer Grundform können zumeist in Wortstamm sowie Präfixe und Suffixe aufgeteilt werden.
+Diese \todo{Tabelle vom Paper rüberholen} einzelnen Bestandteile werden wiederum angepasst.
+Allerdings gibt es auch mehrere Sprachen, die mit Infix und Ablaut statt oder zusätzlich zu Zirkumfix arbeiten.
+\citep{inflection_seq}
 Letztendlich geschieht der Vorgang also auf Zeichen-Ebene, und auch die menschliche Intuition der Sprache funktioniert als zeichenweises Abändern des als Lemma gegebenen Wortes\todo{Beleg?}; es schien uns daher von Beginn an sinnvoll, diese Funktionsweise Zeichen für Zeichen in unserem System umzusetzen.
 
 \begin{figure}[htb]
@@ -117,7 +121,9 @@ bungas & \texttt{N;INST;PL}\\  \addlinespace
 Der unter \autoref{sec:sub:shared_task} beschriebene Shared Task wurde in einer sehr ähnlichen Form schon in den Vorjahren (2017 und 2016) abgehalten, und nachdem die Veranstalter jedes Jahr dazu aufrufen ein \textit{System Description Paper} zu verfassen standen uns recht viele Vorergebnisse und Überlegungen anderer Teilnehmer zur Verfügung. Wir haben uns nicht nur deswegen Inspiration bei manchen dieser Systeme geholt, um Ideen für unser eigenes Verfahren zu entwickeln.
 
 \subsection{Machine Translation}
-Eine andere maßgebliche Grundidee kam aus dem Bereich der maschinellen Übersetzung. Auch hier sollen - entweder auf Wort- oder auf Zeichenebene - Umwandlungsprozesse stattfinden, die konkreten Regeln unterliegen. Insbesondere wird bei der Übersetzung von Vokabeln zunehmend auf Character Embeddings gesetzt\todo{Beleg erforderlich}, und \citet{cjk-mt:LiuLLN17} gehen sogar noch einen Schritt weiter und untersuchen Eigenschaften von Zeichen auf Pixel-Ebene, um die Ergebnisse der Übersetzung weiter zu verbessern.
+Eine andere maßgebliche Grundidee kam aus dem Bereich der maschinellen Übersetzung. Auch hier sollen -- entweder auf Wort- oder auf Zeichenebene -- Umwandlungsprozesse stattfinden, die konkreten Regeln unterliegen.
+Insbesondere wird bei der Übersetzung von Vokabeln zunehmend auf Character Embeddings gesetzt \citep{charMT1, charMT2, charMT3, charMT4, charMT5}.
+\citet{cjk-mt:LiuLLN17} gehen sogar noch einen Schritt weiter und untersuchen Eigenschaften von Zeichen auf Pixel-Ebene, um die Ergebnisse der Übersetzung weiter zu verbessern.
 
 \subsection{Unsere Schlussfolgerungen}
 Mit all diesen verschiedenen Möglichkeiten und dem Einfluss von Deutsch als unsere Muttersprache haben wir uns letzten Endes entschieden, ein von \citet{cluzh:MakarovRC17} veröffentlichtes System als Grundlage zu nehmen in ein eigenes Verfahren zu erweitern.
@@ -144,7 +150,7 @@ Außerdem lässt sich auch ohne formalen Beweis schnell erkennen, dass der oben 
 
 \subsection{Alignment}
 \label{sec:alignment}
-Lemma und Vollform werden durch einen Aligner über Füllzeichen so ausgerichtet, dass möglichst viele übereinstimmende Zeichen miteinander aligniert \todo{ist das ein deutsches Wort? Duden sagt Ja} sind. Dadurch ermöglichen wir dem Transduktor möglichst viele \action{COPY}-Aktionen, die später eine erhebliche Vereinfachung bei der Anwendung der Flexionsregeln bedeuten.
+Lemma und Vollform werden durch einen Aligner über Füllzeichen so ausgerichtet, dass möglichst viele übereinstimmende Zeichen miteinander aligniert sind. Dadurch ermöglichen wir dem Transduktor möglichst viele \action{COPY}-Aktionen, die später eine erhebliche Vereinfachung bei der Anwendung der Flexionsregeln bedeuten.
 
 Der Aligner selbst beruht auf der einfachen Editierdistanz nach \citet{levenshtein:binary66}. Wir haben lediglich eine weitere Bedingung hinzugefügt, die zwei verschiedene Zeichen $a, b$ auch dann mit Kosten $0$ berechnet, wenn ein Patch $p$ existiert, der $a$ in $b$ überführt. Nach Berechnung dieser Kostenfunktion wählen wir dasjenige Alignment, das die geringste Levenshtein-Distanz (zuzüglich unserer \action{PATCH}-Regel) ergibt.
 
@@ -206,7 +212,7 @@ Insbesondere verhält sich der \texttt{NFD}-Standard dabei sehr ähnlich zu unse
 \subsection{Motivation}
 Als eines der großen Schwierigkeiten der Aufgabe haben wir die geringe Menge der Trainingsdaten, insbesondere in den Volumen \textit{low} und \textit{medium}, angesehen. Daher haben wir uns entschieden, die Möglichkeiten des Erweiterns von Trainingsdaten auszuloten. Eine Vorgabe des Shared Tasks war es, keine externe Quellen zu verwenden. Folglich haben wir uns darauf beschränkt zusätzliche Daten aus den vorhandenen Daten zu halluzinieren. Die Idee ist dabei, Muster wie Suffix- und Präfix-Änderungen zu erkennen und zu replizieren, sodass das System diese Regelmäßigkeiten besser lernen kann, auch wenn dadurch seltenere, unregelmäßige Veränderungen relativ gesehen weniger häufig in den erweiterten Trainingsdaten vorkommen.
 
-Einreichungen zu ähnlichen Shared Tasks der Vorjahre haben bereits Trainingsdaten erweitert, darunter auch die Sieger-Einreichung von 2016 \cite{kann-schutze:2016:SIGMORPHON}. Die Einreichung von \citet{bergmanis:augmenting} nutzte zwei Formen eines Sequence Encoders -- eine nutzte Lemmata und Zielformen als Inputs, die andere zufällige Strings.  Die zusätzlichen Trainingsdaten konnten das Ergebnis insgesamt verbessern\todo{wie? M}. \citet{kann-schutze:2017:K17-20} verwendet mehrere Systeme, darunter ein regelbasiertes System. Das System von \citet{silfverberg-EtAl:2017:K17-20} spaltet die Wörter in Präfix, Stamm und Suffix und generiert neue Wörter mit diesen Affixen. Weitere Arbeiten mit Erweiterung von Trainingsdaten sind \cite{zhou-neubig:2017:K17-20} und \cite{nicolai-EtAl:2017:K17-20}.
+Einreichungen zu ähnlichen Shared Tasks der Vorjahre haben bereits Trainingsdaten erweitert, darunter auch die Sieger-Einreichung von 2016 \cite{kann-schutze:2016:SIGMORPHON}. Die Einreichung von \citet{bergmanis:augmenting} nutzte zwei Formen eines Sequence Encoders -- eine nutzte Lemmata und Zielformen als Inputs, die andere zufällige Zeichenketten. Die zusätzlichen Trainingsdaten konnten das Ergebnis in beiden Fällen insgesamt verbessern. \citet{kann-schutze:2017:K17-20} verwendet mehrere Systeme, darunter ein regelbasiertes System. Das System von \citet{silfverberg-EtAl:2017:K17-20} spaltet die Wörter in Präfix, Stamm und Suffix und generiert neue Wörter mit diesen Affixen. Weitere Ansätze zur Erweiterung von Trainingsdaten zeigen \cite{zhou-neubig:2017:K17-20} und \cite{nicolai-EtAl:2017:K17-20}.
 
 \subsection{Grundlegender Erweiterungsprozess}
 Um künstliche Daten für ein Datensatz zu generieren, sortiert unser System die Eingabe-Daten in Gruppen von Flexionen mit denselben Features. Innerhalb jeder Gruppe aligniert und vergleicht es jedes Paar von Lemma und Flexion mit jedem anderen Paar und behält pro Vergleich nur die übereinstimmenden Zeichen an den alignierten Positionen. Das Alignieren erfolgt wie in \autoref{sec:alignment} beschrieben. Die restlichen Zeichen werden gelöscht und nach einem Sprachmodell, das aus dem Datensatz generiert wird, aufgefüllt. Dabei werden die gleichen Zeichen, die im Lemma eingesetzt wurden, auch in der Flexion eingesetzt. Bleiben noch Lücken übrig, werden sie durch weitere Zeichen aus dem Modell aufgefüllt. Das Sprachmodell wird in \autoref{sec:enhancer-example} erläutert.
@@ -513,7 +519,9 @@ ua-01                      & 0                      & racai-01                  
 \multicolumn{6}{l}{$0$: keine Einreichung des Teilnehmers}
 \end{tabular}
 
-\caption{Ergebnisse (Accuracy) aller Teilnehmer am Shared Task für alle Mengen.}
+\caption{Ergebnisse (Accuracy) aller Teilnehmer am Shared Task für alle Mengen.
+\todo[inline]{Wir sollten auch die Levensthein Ergebnisse zeigen, insb. für Schwachstellen hilfreich}}
+
 %Abrufbar unter: \url{https://docs.google.com/spreadsheets/d/1HqOGRyltYvji7pi-jq3swEfoWs15k5QU-lA3ua8dpmo/}
 \label{fig:results_all}
 \end{table*}
@@ -543,7 +551,7 @@ Baseline & 0.52 & 0.91   & 1.86 \\
 Wir      & 0.45 & 0.52   & 1.47\\
 \bottomrule
 \end{tabular}
-\caption{Unsere Ergebnisse (durchschnittliche Levenshtein-Distanz) im Vergleich zur Baseline. Levenshtein-Ergebnisse anderer Teilnehmer lagen nicht vor.}
+\caption{Unsere Ergebnisse (durchschnittliche Levenshtein-Distanz) im Vergleich zur Baseline. \todo[inline]{Levenshtein-Ergebnisse anderer Teilnehmer}}
 \label{fig:lev_comparison}
 \end{table}
 
@@ -599,7 +607,6 @@ Auf die niedrige Datenmenge verbesserte der künstlich erweiterte Datensatz (bes
 \centering
 \includegraphics{beamlow}
 \caption{Histogramm, welches den Effekt von Beam-Größe 16 im Vergleich zu Größe 1 auf dem Test-Datensatz zeigt (Trainiert auf dem kleinsten Datensatz)
-\todo[inline]{Bild Beschriftung auf Deutsch}
 }
 \label{fig:histBeamLowAcc}
 \end{figure}
@@ -653,12 +660,22 @@ Das neuronale Netzwerk müsste daher die Information des zu Beginn gelesenen Pr�
 
 Um jenes Problem zu lösen, müsste der Decoder mittels \textit{soft-attention} freien Zugriff auf die gesamte Ausgabe des Encoders erhalten. Dadurch wäre jedoch eine erfolgreiche Anwendung der \action{COPY} und \action{PATCH} Aktionen auf dem Lemma nicht mehr gegeben, was jedoch den Kern unseres Systems ausmacht.
 
-\section{Teilnahme am Shared Task und Paper}
+\section{Teilnahme am Shared Task und Systembeschreibungs-Paper}
 \label{sec:paper}
-\todo{besser benennen}
-\todo[inline]{Hier können wir schreiben, wie wir am Shared Task teilgenommen haben (Wann wir die Daten bekommen haben, wann wir was abgegeben haben etc.), statt es wie in der Präsentation etwas zu verteilen. Und eben über das Paper berichten. Können das aber wieder trennen oder die Teilnahme-Details ganz weglassen.}
+\todo[inline]{Fehlt: Teilnahme/Ablauf am/des Shared Task (Wann wir die Daten bekommen haben, wann wir was abgegeben haben etc.)
+ggf. Eindrücke vom Schreiben / Veröffentlichen des Papers schildern?
+}
 
-Pünktlich zur Frist der ersten Abgabe haben wir den ersten Entwurf des Papers anonymisiert am 15. August 2018 eingereicht. Das Paper \enquote{Finding the way from ä to a: Sub-character morphological inflection for the SIGMORPHON 2018 Shared Task}\footnote{abrufbar unter \url{https://arxiv.org/abs/1809.05742}} ist acht Seiten lang plus Bibliographie. Am 23. August 2018 haben wir die Nachricht bekommen, dass das Paper akzeptiert wurde, sowie das Feedback zweier anonymer Kritiker erhalten. Dieses beinhaltete unter anderem, dass das Paper \enquote{verständlich geschrieben} sei, mehr Experimente zum Effekt der Patches nötig seien, weitere Zitate für den Enhancer sowie den Hinweis auf Unicode NDF-Dekomposition. Außerdem haben beide Gutachter das Paper nach bestimmten Kriterien bewertet, siehe Tabelle \ref{tab:review}. Beide Reviewer haben dabei die gleichen Wertungen abgegeben, nur die \textit{Reviewer Confidence} unterschied sich bei den beiden Gutachtern. Mit der maximalen Punktzahl wurde die Klarheit des Papers bewertet. Mit einer Wertung von 3 wurde der \textit{Impact of Ideas or Results} am schlechtesten bewertet. Da sich unser System nicht deutlich von anderen System oder bisherigen Ergebnissen absetzen kann, ist diese Wertung nachvollziehbar. Insgesamt erreichen wir mit 24 von 30 Punkten (ausgenommen der \textit{Reviewer Confidence}) 80\% der Punktzahl, ein Ergebnis, mit dem wir sehr zufrieden sind.
+Die Beschreibung unseres Systems haben wir mit dem Titel \enquote{Finding the way from ä to a: Sub-character morphological inflection for the SIGMORPHON 2018 Shared Task}\footnote{abrufbar unter \url{https://arxiv.org/abs/1809.05742}} als Paper veröffentlicht.
+Pünktlich zur Frist der ersten Abgabe haben wir den ersten Entwurf des Papers anonymisiert am 15. August 2018 eingereicht.
+Am 23. August 2018 haben wir die Nachricht bekommen, dass das Paper akzeptiert wurde, sowie das Feedback zweier anonymer Kritiker erhalten.
+Dieses beinhaltete unter anderem, dass das Paper \enquote{verständlich geschrieben} sei, mehr Experimente zum Effekt der Patches nötig seien, weitere Zitate für den Enhancer sowie den Hinweis auf Unicode NDF-Dekomposition.
+Außerdem haben beide Gutachter das Paper nach bestimmten Kriterien bewertet, siehe Tabelle \ref{tab:review}.
+Beide Reviewer haben dabei die gleichen Wertungen abgegeben, nur die \textit{Reviewer Confidence} unterschied sich bei den beiden Gutachtern.
+Mit der maximalen Punktzahl wurde die Klarheit des Papers bewertet.
+Mit einer Wertung von 3 wurde der \textit{Impact of Ideas or Results} am schlechtesten bewertet.
+Da sich unser System nicht deutlich von anderen System oder bisherigen Ergebnissen absetzen kann, ist diese Wertung nachvollziehbar.
+Insgesamt erreichen wir mit 24 von 30 Punkten (ausgenommen der \textit{Reviewer Confidence}) 80\% der Punktzahl, ein Ergebnis, mit dem wir sehr zufrieden sind.
 
 \begin{table}
 \centering
@@ -690,28 +707,35 @@ Außerdem haben wir im fortgeschrittenen Stadium des Projekts Probleme, die Logs
 
 Darüber hinaus haben wir gelernt, wie wichtig Automatisierung ist. Da wir unser System auf mehreren Rechnern verteilt laufen lassen haben, haben wir Skripte genutzt, die diese aufrufen und die Ergebnisse wieder einsammeln. Weitere Automatisierung hat die Ergebnisse schließlich zusammengeführt und auch die Auswertung sowie Erstellen von Grafiken mussten nicht mehr manuell gemacht werden.
 
-Eine weitere wichtige Erfahrung ist, wie wichtig Zeitpuffer und Alternativpläne sind, um auf mögliche Probleme vorbereitet zu sein. Beispielsweise haben wir unsere finale Ergebnisse relativ kurz vor Ablauf der ersten Frist inmitten einer Hitzewelle in Hamburg laufen lassen, was zur Folge hatte, dass die Server, die wir nutzen wollten, wegen eines Ausfalls der Kühlungsanlage abgeschaltet wurden. Wir mussten daher kurzzeitig auf andere, weniger leistungsstarke Server ausweichen.
-\begin{quote}
-[hummel-users] The sun is killing us (operations down due to cooling system failure)
-\end{quote}
+Eine weitere wichtige Erfahrung ist, wie wichtig Zeitpuffer und Alternativpläne sind, um auf mögliche Probleme vorbereitet zu sein. Beispielsweise haben wir unsere finale Ergebnisse relativ kurz vor Ablauf der ersten Frist inmitten einer Hitzewelle in Hamburg laufen lassen, was zur Folge hatte, dass die Server, die wir nutzen wollten, wegen eines Ausfalls der Kühlungsanlage abgeschaltet wurden. Wir mussten daher kurzzeitig auf andere, weniger leistungsstarke Server ausweichen:
+\foreignquote{english}{\textit{[hummel-users] The sun is killing us (operations down due to cooling system failure)}}
 
 \section{Ausblick}
 \label{sec:future_work}
+\todo[inline]{F: Wir könnten hier wohl auf die Unterüberschriften verzichten}
 \subsection{Mögliche Verbesserungen}
 
-Zum Einen können die neuen Features, also die Patches und der Enhancer, verbessert werden.
+Aufbauend auf dem bisherigen System könnten mehrere Verbesserungen an bestehenden Bestandteilen vorgenommen werden.
+Zum Einen können die neuen Features, also die Patches und der Enhancer, erweitert werden.
 \todo[inline]{Patches verbessern: verschiedene Schriftarten, mehr Sprachen abdecken}
 
-Der Enhancer könnte ein besseres Sprachmodell benutzen. Denkbar wäre beispielsweise eine besondere Behandlung von Prä- und Suffixen, eine  bessere Erkennung typischer Silben oder n-Gramme und das Verhindern von untypischen Buchstabenkombinationen.
+Der Enhancer könnte ein besseres Sprachmodell benutzen, um beim Auffüllen der zufällig generierten Worte realistischere Zeichenketten zu erzeugen.
+Denkbar wären außerdem eine besondere Behandlung von Prä- und Suffixen, eine bessere Erkennung typischer Silben bzw. n-Gramme sowie das Verhindern von untypischen Buchstabenkombinationen.
 
-Auch am Transduktor und am Netzwerk können weitere Verbesserungen vorgenommen werden.
-\todo[inline]{Verbesserungen am Transduktor und Netzwerk:\\
-Keine \enquote{Hacks} für Netzwerkausgabe\\
-Einfach: Vernünftige Nachverarbeitung\\
-Optimal: Dynamisches Orakel statt statische Ziel-Sequenz\\
-}
+% Fynn
+Auch am Zusammenspiel von Transduktor und neuronalem Netzwerk können Verbesserungen vorgenommen werden.
+So sollte die fehlerhafte Nachverarbeitung im Transduktor durch ein anderes Verfahren ersetzt werden.
+In diesem wird die Ausgabe des Netzwerks unverändert übernommen, sofern es ein valides Wort mit \action{EOW} als letzte Ausgabe vorliegt.
+Nur in dem Fall, wenn das Netzwerk nicht innerhalb der maximalen Ausgabelänge zum Ende kommt, wird in einem Nachverarbeitungsschritt die Netzwerkausgabe beispielweise durch das Lemma ersetzt.
+Einen Schritt weiter ginge die Optimierung des neuronalen Netzwerkes, um das Auftreten endloser Ausgaben zu reduzieren bzw. zu unterbinden.
+Dazu könnte statt der bisherigen festen Ziel-Sequenz, welche durch den statischen Orakel-Algorithmus erstellt wird, ein dynamisches Orakel eingesetzt werden.
+Zusammen mit Beam-Decoding könnte das Training des Netzwerkes dann wie folgt ablaufen:
+Für jede weitere Aktion wird je Pfad geprüft, ob diese Aktionskette noch zu dem richtigen Ergebnis führen kann.
+Ausschließlich, falls dies nicht der Fall ist, wird ein Trainingsupdate vorgenommen.
+Ansonsten darf diese Sequenz fortgesetzt werden.
+Durch ein derartiges Vorgehen sollte das Netzwerk sich besser in beliebigen Zuständen zurechtfindet, wodurch die Robustheit bei ungesehen Eingaben erhöht wird.
 
-Letztendlich sollten weitere Parameterkombinationen getestet werden, um die Beste Kombination zu finden. Auch bisher ungetestete Werte für die einzelnen Parameter sollten in Betracht gezogen werden.
+% Letztendlich sollten weitere Parameterkombinationen getestet werden, um die Beste Kombination zu finden. Auch bisher ungetestete Werte für die einzelnen Parameter sollten in Betracht gezogen werden.
 
 \subsection{Weitere Anwendungsmöglichkeiten}
 
