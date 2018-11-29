@@ -30,17 +30,26 @@
 
 \aclfinalcopy
 
-\title{Projekt Sprachtechnologie\\Projektbericht}
+\title{Projektbericht Sprachtechnologie 2018}
 
-\author{Fynn Schröder\qquad (7003971)\\Marcel Kamlot\qquad(6208685)\\Gregor Billing\qquad(6808038)}
+\author{
+Fynn Schröder\\
+(7003971)
+\\\And Marcel Kamlot\\
+(6208685)
+\\\And Gregor Billing\\
+(6808038)}
 
 \date{20.09.2018}
 
+
 \begin{document}
 \maketitle
+\pagestyle{plain}
+\pagenumbering{arabic}
 
 \begin{abstract}
-\todo[inline]{Abstrakte Zusammenfassung des Inhalts (in gewisser Weise auf Meta-Ebene). Vorwegnahme der "Ergebnisse", wenn möglich}
+\todo[inline]{Abstrakte Zusammenfassung des Inhalts (in gewisser Weise auf Meta-Ebene). Vorwegnahme der \enquote{Ergebnisse}, wenn möglich}
 \end{abstract}
 
 \section{Einleitung und Aufgabenstellung}
@@ -83,8 +92,9 @@ Milchkuh & Milchkühen & N;DAT;PL\\
 \label{fig:german-declension}
 \end{table}
 
-Das Ziel der Aufgabe ist es, je %unabhängig von der Ursprungssprache \todo{inwiefern unabhängig? Trainiert wird ja auf der gleichen Sprache. M} 
-erst kurz vor Ende der Entwicklungszeit veröffentlichtes Test-Set eine möglichst hohe Accuracy zu erreichen. Wir haben es uns darüber hinaus als Ziel gesetzt, die Levenshtein-Distanz der Ausgabe zu minimieren. Es wurden von uns also zwei verschiedene Metriken angewandt:
+Das Ziel der Aufgabe ist es, %je unabhängig von der Ursprungssprache \todo{inwiefern unabhängig? Trainiert wird ja auf der gleichen Sprache. M} 
+auf einem erst kurz vor Ende der Entwicklungszeit veröffentlichten Test-Set, eine möglichst hohe Accuracy zu erreichen.
+Wir haben es uns darüber hinaus als Ziel gesetzt, die Levenshtein-Distanz der Ausgabe zu minimieren. Es wurden von uns also zwei verschiedene Metriken angewandt:
 \begin{itemize}
     \item \textbf{Accuracy} als Standardmaß von korrekten Ausgaben im Verhältnis zu allen Ausgaben des Systems insgesamt
     \item \textbf{Levenshtein-Distanz} gemäß der klassischen Definition von \citet{levenshtein:binary66} um festzustellen, wie weit eine Ausgabe des Systems vom Goldstandard entfernt liegt. Insbesondere hat eine korrekte Ausgabe des Systems also immer einen Distanz-Wert von $0$
@@ -99,9 +109,10 @@ Aufgabe 2 wurde von uns nicht bearbeitet. Sie behandelt Flexion im Kontext: In e
 \section{Herangehensweise}
 \label{sec:approach}
 
+% ?, Fynn
 Die Flexion als solche unterliegt als morphologischer Prozess in vielen Sprachen den grundlegenden Wortbildungsprozessen mit Affixen.
 Wörter in ihrer Grundform können zumeist in Wortstamm sowie Präfixe und Suffixe aufgeteilt werden.
-Diese \todo{Tabelle vom Paper rüberholen} einzelnen Bestandteile werden wiederum angepasst.
+Diese \todo{Tabelle vom Paper rüberholen\\F: Welche Tabelle?} einzelnen Bestandteile werden wiederum angepasst.
 Allerdings gibt es auch mehrere Sprachen, die mit Infix und Ablaut statt oder zusätzlich zu Zirkumfix arbeiten.
 \citep{inflection_seq}
 Letztendlich geschieht der Vorgang also auf Zeichen-Ebene, und auch die menschliche Intuition der Sprache funktioniert als zeichenweises Abändern des als Lemma gegebenen Wortes\todo{Beleg?}; es schien uns daher von Beginn an sinnvoll, diese Funktionsweise Zeichen für Zeichen in unserem System umzusetzen.
@@ -191,7 +202,7 @@ Die Idee zur Verwendung dieser Patches kam uns als deutsche Muttersprachler bei 
 
 \subsection{Motivation}
 Die zuvor beschriebene Einteilung von Patches erscheint sinnvoll, da viele Wörter im Deutschen den Wortstamm - also eben den Teil des Wortes den unsere Architektur optimalerweise einfach mit \action{COPY}-Wiederholungen übernehmen soll - bei der Flektion verändern (siehe Tabelle X).
-Ein ähnliches Phänomen lässt sich auch in anderen Sprachen beobachten \citep{wiese:umlaut2009;kendris:cedilla2001}, weswegen wir den Entschluss gefasst haben das Konzept der \textit{Patches} fest in unser System zu verbauen. Obgleich wir nicht jede der über 100 bereitgestellten Sprachen beherrschen, steht so zumindest auf jedem Datensatz die Möglichkeit zur Verfügung, Patch-Aktionen durchzuführen. Im schlimmsten Fall, d.h. falls eine Sprache dieses Konzept überhaupt nicht nutzt, würden auch keine Patches gelernt und das System fällt auf einen einfachen Transduktionsprozess mit ausschließlich \action{COPY}, \action{MOVE} und \action{EMIT}-Aktionen zurück.
+Ein ähnliches Phänomen lässt sich auch in anderen Sprachen beobachten \citep{wiese:umlaut2009, kendris:cedilla2001}, weswegen wir den Entschluss gefasst haben das Konzept der \textit{Patches} fest in unser System zu verbauen. Obgleich wir nicht jede der über 100 bereitgestellten Sprachen beherrschen, steht so zumindest auf jedem Datensatz die Möglichkeit zur Verfügung, Patch-Aktionen durchzuführen. Im schlimmsten Fall, d.h. falls eine Sprache dieses Konzept überhaupt nicht nutzt, würden auch keine Patches gelernt und das System fällt auf einen einfachen Transduktionsprozess mit ausschließlich \action{COPY}, \action{MOVE} und \action{EMIT}-Aktionen zurück.
 
 Eine weitere Inspiration war die zuvor bereits zitierte Arbeit von \citet{cjk-mt:LiuLLN17}, in der für ostasiatische Sprachen mit nicht-lateinischen Alphabeten die Auswirkung von Symbolfragmenten auf Pixelebene auf die Ergebnisse von Machine Translation untersucht wurde.
 Insbesondere der Code, den die Autoren online verfügbar gemacht haben, war uns eine große Hilfe für unsere eigene erste grundlegende Implementation.
@@ -263,10 +274,12 @@ N-Gramm & Zeichen & Frequenz & p\\ \midrule
 Theoretisch funktioniert dieses System besser mit größeren Datensätzen, da mehr Muster erkannt werden. Leider bedeutet dies auch, dass für kleinere Datensätze, bei denen zusätzliche Trainingsdaten besonders wichtig sind, die Qualität der künstlichen Daten geringer ist als für größere, bei denen es weniger nötig ist.
 
 \section{Systemaufbau}
+% Fynn
 \label{sec:architecture}
 Das System, welches wir für den Shared Task entwickelt haben verwendet ein neuronales Netzwerk zusammen mit dem String-Transduktor aus \autoref{sec:transducer}. Bevor unser System im Detail vorgestellt wird, soll zuerst die Funktionsweise des Baseline-Systems dargestellt werden.
 
 \subsection{Baseline}
+ % Fynn
 \label{sec:baseline}
 Das Baseline-System basiert auf Mustererkennung in Prefix bzw. Suffix von Lemma und Flexion. Das System ist dabei stark von Vorgehensweisen von \cite{baseline:Ling2016} inspiriert.
 
@@ -281,6 +294,7 @@ Ferner ist das Baseline-System hinsichtlich der Laufzeitperformanz fast allen an
 Weitere Details zur Umsetzung der Baseline finden sich in der Beschreibung des Shared Tasks aus dem letzten Jahr \cite{sigmorphon:st2017}.
 
 \subsection{Neuronales Netzwerk}
+% Fynn
 \begin{figure}
 \centering
 \includegraphics[width=\linewidth]{architecture_de}
@@ -318,6 +332,7 @@ Immer, wenn der Decoder eine \action{MOVE} Aktion ausgibt, wird der Index-Zeiger
 Falls Aktionen den Index-Zeiger über die Länge des Lemmas hinaus schieben würden, so werde diese ignoriert.
 
 \subsection{Beamsearch}
+% Fynn
 
 % dreht die Seite nicht, sondern nur die Grafik (leichter Druck, schlecht am Bildschirm)
 %\begin{sidewaysfigure}[htbp]
@@ -381,6 +396,8 @@ Es kann jedoch auch dazu verwendet werden, das Training des Netzwerkes zu verbes
 
 \subsection{Training}
 \label{sec:training}
+% Fynn
+
 Da das neuronale Netzwerk eine Sequenz von Transduktor Aktionen ausgibt, handelt es sich bei den Trainingszielen nicht um flektierte Wörter, sondern ebenfalls um Aktionssequenzen, die die eigentlichen Flexionen produzieren, wenn sie auf das Lemma angewandt werden.
 Diese Aktionssequenzen werden zuvor von unserem System erzeugt, indem im Gleichschritt über das alignierte Lemma und das flektierte Wort iteriert wird.
 Für jede Zeichenkombination werden die zugehörigen Aktionen der neuen Ausgabesequenz hinzugefügt.
@@ -424,6 +441,7 @@ Aufgrund der relativ komplexen Implementierung des Beam-Decoding haben wir bis z
 
 \section{Feinabstimmung und Evaluation}
 \label{sec:tuning_evaluation}
+% Fynn
 
 \begin{table*}[htb]
     \centering
@@ -476,55 +494,90 @@ Für die finale Evaluation der Testdatensätze haben wir die beste Parameterkomb
 \label{sec:eingereichte_ergebnisse}
 
 \begin{table*}[tbh]
-%\small
-\centering
-\begin{tabular}{lr|lr|lr}
+% Fynn
+\newcommand{\incompl}[1]{\color{gray}#1}
+\newcommand{\wir}[1]{\textbf{#1}}
+\newcommand{\bl}[1]{\textit{#1}}
+\begin{tabular}{lc|lc|lc}
 \toprule
-\textbf{high}             & & \textbf{medium}                 &  & \textbf{low}                  &  \\
+\multicolumn{2}{c}{high}                  & \multicolumn{2}{c}{medium}                & \multicolumn{2}{c}{low}                        \\
 \midrule
-Teilnehmer                 & Accuracy                    & Teilnehmer                & Accuracy                      & Teilnehmer                & Accuracy
-\\
-\rule{0pt}{3ex}uzh-01                     & 96                     & uzh-01                     & 86.64                   & uzh-02                     & 57.21                  \\
-uzh-02                     & 95.97                  & uzh-02                     & 86.38                   & uzh-01                     & 57.18                  \\
-bme-02                     & 94.66                  & iitbhu-iiith-02            & 84.19                   & ua-08                      & 53.22                  \\
-iitbhu-iiith-02            & 94.43                  & iitbhu-iiith-01            & 82.9                    & iitbhu-iiith-02            & 52.6                   \\
-iitbhu-iiith-01            & 94.43                  & waseda-01                  & 77.38                   & ua-05                      & 50.53                  \\
-bme-03                     & 93.97                  & msu-04                     & 76.4                    & iitbhu-iiith-01            & 49.79                  \\
-bme-01                     & 93.88                  & msu-03                     & 75.74                   & ua-06                      & 49.73                  \\
-msu-04                     & 91.87                  & \textbf{hamburg-01}        & \textbf{74.03}          & ua-03                      & 44.82                  \\
-iit-varanasi-01            & 91.73                  & iit-varanasi-01            & 70.17                   & waseda-01                  & 44.09                  \\
-waseda-01                  & 91.12                  & msu-02                     & 69.45                   & msu-02                     & 41.61                  \\
-msu-03                     & 90.52                  & bme-01                     & 67.43                   & \textbf{hamburg-01}        & \textbf{40.28}         \\
-axsemantics-01             & 84.19                  & bme-03                     & 67.36                   & ua-02                      & 39.19                  \\
-msu-02                     & 82.68                  & bme-02                     & 67.26                   & ua-01                      & 38.22                  \\
-\textbf{hamburg-01}        & \textbf{77.53}         & \textit{\textbf{baseline}} & \textit{\textbf{61.78}} & \textit{\textbf{baseline}} & \textit{\textbf{38.2}} \\
-\textit{\textbf{baseline}} & \textit{\textbf{75.3}} & axsemantics-02             & 60                      & ua-07                      & 37.99                  \\
-axsemantics-02             & 74.77                  & msu-01                     & 54.44                   & msu-04                     & 31.4                   \\
-msu-01                     & 74.33                  & tuebingen-oslo-03          & 30.98                   & msu-03                     & 25.86                  \\
-racai-01                   & 72.49                  & tuebingen-oslo-02          & 29.72                   & iit-varanasi-01            & 23.33                  \\
-tuebingen-oslo-03          & 63.05                  & kucst-01                   & 29.12                   & ua-04                      & 21.25                  \\
-tuebingen-oslo-02          & 56.6                   & tuebingen-oslo-01          & 20.97                   & axsemantics-02             & 14.74                  \\
-tuebingen-oslo-01          & 49.52                  & axsemantics-01             & 9.1                     & tuebingen-oslo-02          & 4.43                   \\
-kucst-01                   & 48.68                  & ua-08                      & 0                       & bme-01                     & 3.74                   \\
-ua-08                      & 0                      & ua-07                      & 0                       & bme-03                     & 3.63                   \\
-ua-07                      & 0                      & ua-06                      & 0                       & kucst-01                   & 2.52                   \\
-ua-06                      & 0                      & ua-05                      & 0                       & bme-02                     & 2.43                   \\
-ua-05                      & 0                      & ua-04                      & 0                       & tuebingen-oslo-03          & 1.39                   \\
-ua-04                      & 0                      & ua-03                      & 0                       & axsemantics-01             & 0.7                    \\
-ua-03                      & 0                      & ua-02                      & 0                       & tuebingen-oslo-01          & 0                      \\
-ua-02                      & 0                      & ua-01                      & 0                       & racai-01                   & 0                      \\
-ua-01                      & 0                      & racai-01                   & 0                       & msu-01                     & 0         
-\\
+uzh             & 96.00 / 0.08            & uzh             & 86.64 / 0.26            & uzh                   & 57.21 / 1.02           \\
+bme             & 94.66 / 0.11            & iitbhu-iiith    & 84.19 / 0.32            & iitbhu-iiith          & 52.60 / 1.10           \\
+iitbhu-iiith    & 94.43 / 0.11            & \wir{hamburg}   & \wir{74.03 / 0.54}      & ua                    & 53.22 / 1.35           \\
+iit-varanasi    & 91.73 / 0.16            & msu             & 76.40 / 0.55            & \wir{hamburg}         & \wir{40.28 / 1.45}     \\
+waseda          & 91.12 / 0.19            & iit-varanasi    & 70.17 / 0.66            & waseda-01             & 44.09 / 1.68           \\
+msu             & 91.87 / 0.23            & waseda          & 77.38 / 0.67            & msu                   & 41.61 / 1.86           \\
+axsemantics     & 84.19 / 0.40            & bme             & 67.43 / 0.75            & \bl{baseline}         & \bl{38.89} / \bl{1.88} \\
+\wir{hamburg}   & \wir{77.53 / 0.44}      & \bl{baseline}   & \bl{63.53} / \bl{0.90}  & iit-varanasi          & 23.33 / 2.40           \\
+\bl{baseline}   & \bl{77.42} / \bl{0.51}  & axsemantics     & 60.00 / 1.03            & tuebing.-oslo        & \ 4.43 / 5.06             \\
+tuebing.-oslo  & 63.05 / 1.15             & tuebing.-oslo  & 30.98 / 2.25             & bme                   & \ 3.74 / 6.72            \\
+\incompl{racai} & \incompl{79.93 / 0.43}  & \incompl{kucst} & \incompl{32.28 / 2.23}  & \incompl{axsemantics} & \incompl{14.89 / 3.89} \\
+\incompl{kucst} & \incompl{54.37 / 1.57}  & \incompl{ua}    & \incompl{\ \ --- / ---} & \incompl{kucst}       & \incompl{\ 2.79 / 5.28}\\
+\incompl{ua}    & \incompl{\ \ --- / ---} & \incompl{racai} & \incompl{\ \ --- / ---} & \incompl{racai}       & \incompl{\ \ --- / ---}\\
+
 \bottomrule
-\multicolumn{6}{l}{$0$: keine Einreichung des Teilnehmers}
 \end{tabular}
-
-\caption{Ergebnisse (Accuracy) aller Teilnehmer am Shared Task für alle Mengen.
-\todo[inline]{Wir sollten auch die Levensthein Ergebnisse zeigen, insb. für Schwachstellen hilfreich}}
-
-%Abrufbar unter: \url{https://docs.google.com/spreadsheets/d/1HqOGRyltYvji7pi-jq3swEfoWs15k5QU-lA3ua8dpmo/}
+\caption{Durchschnittliche Ergebnisse über alle 103 Sprachen als Accuracy (Prozentpunkte) / mittlere Levensthein-Distanz (von der korrekten Form in Zeichen) aller Teilnehmer am Shared Task 2018.
+Sofern Teilnehmer mehrere Systeme eingereicht haben, wird nur das je Trainingsdatenmenge beste System aufgeführt.
+Die Zeilen sind je Trainingsdatenmenge nach Levensthein-Distanz aufsteigend sortiert.
+Ausgegraute Einträge repräsentieren unvollständige Einreichungen, die sich nicht sinnvoll vergleichen lassen und daher immer am Ende gelistet werden.
+Ergebnisse sind aus Tabelle 8 in \citet{sigmorphon:st2018} entnommen.}
 \label{fig:results_all}
 \end{table*}
+
+%\begin{table*}[tbh]
+%%\small
+%\centering
+%\begin{tabular}{lr|lr|lr}
+%\toprule
+%\textbf{high}             & & \textbf{medium}                 &  & \textbf{low}                  &  \\
+%\midrule
+%Teilnehmer                 & Accuracy                    & Teilnehmer                & Accuracy                      & Teilnehmer                & Accuracy
+%\\
+%\rule{0pt}{3ex}uzh-01                     & 96                     & uzh-01                     & 86.64                   & uzh-02                     & 57.21                  \\
+%uzh-02                     & 95.97                  & uzh-02                     & 86.38                   & uzh-01                     & 57.18                  \\
+%bme-02                     & 94.66                  & iitbhu-iiith-02            & 84.19                   & ua-08                      & 53.22                  \\
+%iitbhu-iiith-02            & 94.43                  & iitbhu-iiith-01            & 82.9                    & iitbhu-iiith-02            & 52.6                   \\
+%iitbhu-iiith-01            & 94.43                  & waseda-01                  & 77.38                   & ua-05                      & 50.53                  \\
+%bme-03                     & 93.97                  & msu-04                     & 76.4                    & iitbhu-iiith-01            & 49.79                  \\
+%bme-01                     & 93.88                  & msu-03                     & 75.74                   & ua-06                      & 49.73                  \\
+%msu-04                     & 91.87                  & \textbf{hamburg-01}        & \textbf{74.03}          & ua-03                      & 44.82                  \\
+%iit-varanasi-01            & 91.73                  & iit-varanasi-01            & 70.17                   & waseda-01                  & 44.09                  \\
+%waseda-01                  & 91.12                  & msu-02                     & 69.45                   & msu-02                     & 41.61                  \\
+%msu-03                     & 90.52                  & bme-01                     & 67.43                   & \textbf{hamburg-01}        & \textbf{40.28}         \\
+%axsemantics-01             & 84.19                  & bme-03                     & 67.36                   & ua-02                      & 39.19                  \\
+%msu-02                     & 82.68                  & bme-02                     & 67.26                   & ua-01                      & 38.22                  \\
+%\textbf{hamburg-01}        & \textbf{77.53}         & \textit{\textbf{baseline}} & \textit{\textbf{61.78}} & \textit{\textbf{baseline}} & \textit{\textbf{38.2}} \\
+%\textit{\textbf{baseline}} & \textit{\textbf{75.3}} & axsemantics-02             & 60                      & ua-07                      & 37.99                  \\
+%axsemantics-02             & 74.77                  & msu-01                     & 54.44                   & msu-04                     & 31.4                   \\
+%msu-01                     & 74.33                  & tuebingen-oslo-03          & 30.98                   & msu-03                     & 25.86                  \\
+%racai-01                   & 72.49                  & tuebingen-oslo-02          & 29.72                   & iit-varanasi-01            & 23.33                  \\
+%tuebingen-oslo-03          & 63.05                  & kucst-01                   & 29.12                   & ua-04                      & 21.25                  \\
+%tuebingen-oslo-02          & 56.6                   & tuebingen-oslo-01          & 20.97                   & axsemantics-02             & 14.74                  \\
+%tuebingen-oslo-01          & 49.52                  & axsemantics-01             & 9.1                     & tuebingen-oslo-02          & 4.43                   \\
+%kucst-01                   & 48.68                  & ua-08                      & 0                       & bme-01                     & 3.74                   \\
+%ua-08                      & 0                      & ua-07                      & 0                       & bme-03                     & 3.63                   \\
+%ua-07                      & 0                      & ua-06                      & 0                       & kucst-01                   & 2.52                   \\
+%ua-06                      & 0                      & ua-05                      & 0                       & bme-02                     & 2.43                   \\
+%ua-05                      & 0                      & ua-04                      & 0                       & tuebingen-oslo-03          & 1.39                   \\
+%ua-04                      & 0                      & ua-03                      & 0                       & axsemantics-01             & 0.7                    \\
+%ua-03                      & 0                      & ua-02                      & 0                       & tuebingen-oslo-01          & 0                      \\
+%ua-02                      & 0                      & ua-01                      & 0                       & racai-01                   & 0                      \\
+%ua-01                      & 0                      & racai-01                   & 0                       & msu-01                     & 0         
+%\\
+%\bottomrule
+%\multicolumn{6}{l}{$0$: keine Einreichung des Teilnehmers}
+%\end{tabular}
+%
+%\caption{Ergebnisse (Accuracy) aller Teilnehmer am Shared Task für alle Mengen.
+%\todo[inline]{Wir sollten auch die Levensthein Ergebnisse zeigen, insb. für Schwachstellen hilfreich}}
+%
+%%Abrufbar unter: \url{https://docs.google.com/spreadsheets/d/1HqOGRyltYvji7pi-jq3swEfoWs15k5QU-lA3ua8dpmo/}
+%\label{fig:results_all}
+%\end{table*}%
+
+
 
 \begin{table}
 \centering
@@ -532,12 +585,12 @@ ua-01                      & 0                      & racai-01                  
 \toprule
                  & high   & medium & low    \\
                  \midrule
-Baseline         & 75.5\% & 64.8\% & 38.2\% \\
-Ø aller Systeme & 81.3\% & 61,0\% & 30.7\% \\
-Wir              & 77.5\% & 74,0\% & 40.3\% \\
+Baseline         & 77.42 & 63.53 & 38.39 \\
+Ø Teilnehmer     & 87.17 & 69.69 & 35.61 \\
+Wir              & 77.53 & 74.03 & 40.28 \\
 \bottomrule
 \end{tabular}
-\caption{Unsere Ergebnisse (Accuracy) im Vergleich.  Durchschnitt ohne $0$}
+\caption{Accuracy (in Prozentpunkten) unserer Ergebnisse im Vergleich zur Baseline sowie dem Durchschnitt der besten, vollständigen Einreichungen je Team.}
 \label{fig:acc_comparison}
 \end{table}
 
@@ -547,21 +600,29 @@ Wir              & 77.5\% & 74,0\% & 40.3\% \\
 \toprule
          & high & medium & low  \\
          \midrule
-Baseline & 0.52 & 0.91   & 1.86 \\
-Wir      & 0.45 & 0.52   & 1.47\\
+Baseline     & 0.51 & 0.90   & 1.88 \\
+Ø Teilnehmer & 0.32 & 0.78   & 2.51 \\
+Wir          & 0.44 & 0.54   & 1.45\\
 \bottomrule
 \end{tabular}
-\caption{Unsere Ergebnisse (durchschnittliche Levenshtein-Distanz) im Vergleich zur Baseline. \todo[inline]{Levenshtein-Ergebnisse anderer Teilnehmer}}
+\caption{Durchschnittliche Levenshtein-Distanz unserer Ergebnisse im Vergleich zur Baseline sowie dem Durchschnitt der besten, vollständigen Einreichungen je Team.}
 \label{fig:lev_comparison}
 \end{table}
 
-In \autoref{fig:results_all} sind die veröffentlichten Ergebnisse aller Teilnehmer für alle Datenmengen dargestellt. Wir konnten uns im guten Mittelfeld positionieren und stets die Baseline schlagen.
+% Marcel?, Fynn
+In \autoref{fig:results_all} sind die veröffentlichten Ergebnisse der besten Systeme je Team für die drei Trainingsdatenmengen dargestellt. Wir konnten uns auf \textit{medium} und \textit{low} im oberen Drittel platzieren. Auf dem \textit{high} Datensatz liegt unser System jedoch in der unteren Hälfte. Dennoch konnten wir immer die Baseline übertreffen.
 
-Die beste Position (Position 8 von 21, oberen $38.1\%$) und die größte Verbesserung im Vergleich zur Baseline ($+12.15\%$) konnten wir mit einer Genauigkeit von $74.03\%$ auf der Menge \textit{medium} erreichen . Auf \textit{high} und \textit{low} lagen unsere Ergebnisse mit $77.53\%$ bzw. $40.28\%$ etwa $2\%$ über der Baseline und in den oberen $63.6\%$ beziehungsweise $40.7\%$ der eingereichten Ergebnisse.
+Die beste Platzierung (Rang 3 von 10) und die größte Verbesserung im Vergleich zur Baseline ($10.50$ Prozentpunkte) konnten wir mit einer Genauigkeit von $74.03$ Prozentpunkten bzw. Levenshtein-Distanz von $0.54$ auf der mittlere Trainingsdatenmenge erreichen.
+Auf \textit{high} und \textit{low} lagen unsere Ergebnisse mit $77.53$ / $0.44$ bzw. $40.28$ / $1.45$ hinsichtlich der Accuracy nur knapp über der Baseline, während wir zumindest auf \textit{low} bei der Levensthein-Distanz einen deutlichen Vorsprung haben.
 
-In Tabellen \ref{fig:acc_comparison} und \ref{fig:lev_comparison} sind unsere Ergebnisse nach Accuracy und Levenshtein im Vergleich zur Baseline sowie zum Durchschnitt der anderen Teilnehmern (nur Accuracy) aufgeführt. Wir konnten die durchschnittliche Accuracy der Teilnehmer auf \textit{medium} ($+13.0\%$) und \textit{low} ($+9.6\%$) schlagen. Die durchschnittliche Levenshtein-Distanz der Baseline konnten wir auf allen Mengen schlagen. Besonders auf \textit{medium} ($-0.39$) ist die Verbesserung mit $42.9\%$ deutlich, bei \textit{high} ($-0.07$, Verbesserung um $13.5\%$) und \textit{low} ($-0.39$, Verbesserung um $21.0\%$) weniger deutlich.
+In den Tabellen \ref{fig:acc_comparison} und \ref{fig:lev_comparison} sind unsere Ergebnisse nach Accuracy und Levenshtein im Vergleich zur Baseline sowie zum Durchschnitt der anderen Teilnehmer aufgeführt. Wir konnten die durchschnittliche Accuracy der Teilnehmer auf \textit{medium} ($+4.34$) und \textit{low} ($+4.67$) schlagen.
+Die Accuracy der Baseline konnten wir auf allen Mengen schlagen.
+Dies gilt auch für die durchschnittliche Levensthein-Distanz.
+Besonders auf \textit{medium} ($-0.36$) ist die Verbesserung relativ gesehen mit $40\%$ deutlich, bei \textit{high} ($-0.07$, Verbesserung um $13\%$) und \textit{low} ($-0.43$, Verbesserung um $22\%$) weniger deutlich.
+Gegenüber dem Durchschnitt der anderen Teilnehmer fällt unser Vorsprung auf \textit{medium} kleiner, dafür auf \textit{low} größer aus.
 
-\autoref{tab:langs_baseline} zeigt die Sprachen, die am Weitesten \textbf{über} und \textbf{unter} der Baseline lagen. In \autoref{sec:schwachstellen} werden die Schwachstellen des Systems beschrieben, die mit hoher Wahrscheinlichkeit zumindest zum Teil für die schlechten Ergebnisse auf manchen Sprachen verantwortlich sind.
+
+\autoref{tab:langs_baseline} zeigt die Sprachen, die am weitesten \textbf{über} und \textbf{unter} der Baseline lagen. In \autoref{sec:schwachstellen} werden die Schwachstellen des Systems beschrieben, die mit hoher Wahrscheinlichkeit zumindest zum Teil für die schlechten Ergebnisse auf manchen Sprachen verantwortlich sind.
 
 \begin{table}
 \centering
@@ -602,10 +663,11 @@ Auf die niedrige Datenmenge verbesserte der künstlich erweiterte Datensatz (bes
 
 \subsection{Effekt Beam-Decoding}
 \label{sec:beam-results}
+% Fynn
 
 \begin{figure}
 \centering
-\includegraphics{beamlow}
+\includegraphics[width=\linewidth]{beamlow}
 \caption{Histogramm, welches den Effekt von Beam-Größe 16 im Vergleich zu Größe 1 auf dem Test-Datensatz zeigt (Trainiert auf dem kleinsten Datensatz)
 }
 \label{fig:histBeamLowAcc}
@@ -618,13 +680,13 @@ Etwa ein Drittel der Sprachen weist eine leichte Verbesserung der Accuracy zwisc
 Während bei einigen Sprachen sogar ein noch stärkerer Anstieg der Accuracy auftritt, zeigen nur wenige Sprachen eine minimale Verschlechterung durch Beam-Decoding.
 
 Über alle Sprachen gemittelt führt der Einsatz von Beam-Decoding mit Größe 16 zu einer Erhöhung der Accuracy von 4\%.
-% A binomial test shows that the probability of the increase being random is as low as $2.4 \times 10^{-10}$. Beam-decoding therefore clearly leads to an increase in accuracy which matches the intuition of beam-decoding producing better or equal results compared to greedy decoding.
 Ein Binomialtest zur Prüfung, ob es sich ausschließlich um zufällige Erhöhungen handelt, weist im Ergebnis eine Wahrscheinlichkeit von nur $2.4 \times 10^{-10}$ auf.
 Daher führt Beam-Decoding zu einem merklichen Anstieg der Accuracy, was auch mit der Intuition übereinstimmt, dass Beam-Decoding nur bessere oder gleiche Ergebnisse im Vergleich zu \textit{greedy decoding} liefert.
 
 
 \subsection{Schwachstellen}
 \label{sec:schwachstellen}
+% Fynn 
 Unser System weist mehrere Schwachstellen auf, von denen manche bewusste Architekturentscheidungen sind, andere jedoch aus einer suboptimalen Implementierung entstanden.
 
 % --- fehlerhafte Umsetzung
@@ -679,7 +741,7 @@ Insgesamt erreichen wir mit 24 von 30 Punkten (ausgenommen der \textit{Reviewer 
 
 \begin{table}
 \centering
-\begin{tabular}{lr}
+\begin{tabularx}{\linewidth}{Xr}
 \toprule
 \textbf{Kategorie}            & \textbf{Wertung}  \\
 \midrule
@@ -694,7 +756,7 @@ Total (von 30)               & 24             \\
 \midrule
 Reviewer Confidence          & 5; 4          \\
 \bottomrule
-\end{tabular}
+\end{tabularx}
 \caption{Wertung der Gutachter auf einer Skala von 1 (schlechteste Wertung) bis 5 (beste Wertung). Beide Gutachter haben die gleichen Werte angegeben, nur die \textit{Reviewer Confidence} unterschied sich.}
 \label{tab:review}
 \end{table}
