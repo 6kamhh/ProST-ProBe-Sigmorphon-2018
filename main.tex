@@ -1,7 +1,7 @@
 \documentclass[11pt,a4paper]{article}
 
 \usepackage{latexsym}
-\usepackage[german]{babel}
+\usepackage[ngerman,english]{babel}
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath}
 \usepackage{graphicx}
@@ -41,7 +41,7 @@ Fynn Schröder\\
 (6808038)}
 
 \date{20.09.2018}
-
+\selectlanguage{ngerman}
 
 \begin{document}
 \maketitle
@@ -54,8 +54,8 @@ Fynn Schröder\\
 
 \section{Einleitung und Aufgabenstellung}
 \label{sec:introduction}
-In diesem Projekt haben sich die Autoren mit Wortflexion, also der Wortbildung durch Anpassung an die grammatische Funktion innerhalb des Satzes befasst. Im Deutschen umfasst dies üblicherweise die Deklination von Substantiven und Adjektiven nach Kasus, Numerus und Genus sowie die Konjugation von Verben.
-Andere Sprachen können jedoch anderen Flexionsparadigma unterliegen, und so wurde von Anfang an darauf geachtet, ein möglichst sprach-neutrales System zu entwerfen, das sich unabhängig der tatsächlichen Strukturen auf eine Vielzahl von Beispielsprachen anwenden lässt.
+In diesem Projekt haben sich die Autoren mit Flexion, also dem morphologischen Prozess der Wortbildung durch Anpassung an die grammatische Funktion innerhalb des Satzes, befasst. Im Deutschen bezeichnet dies üblicherweise die Deklination von Substantiven und Adjektiven nach Kasus, Numerus und Genus sowie die Konjugation von Verben.
+Andere Sprachen unterliegen jedoch unterschiedlichen Flexionsparadigma, und somit wurde von Anfang an darauf geachtet, ein möglichst sprach-unabhängiges System zu entwerfen das in der Lage ist, die tatsächlichen Strukturen einer Vielzahl von Beispielsprachen zu lernen und anwenden zu können.
 
 \subsection{SIGMORPHON Shared Task}
 \label{sec:sub:shared_task}
@@ -99,7 +99,7 @@ Wir haben es uns darüber hinaus als Ziel gesetzt, die Levenshtein-Distanz der A
     \item \textbf{Accuracy} als Standardmaß von korrekten Ausgaben im Verhältnis zu allen Ausgaben des Systems insgesamt
     \item \textbf{Levenshtein-Distanz} gemäß der klassischen Definition von \citet{levenshtein:binary66} um festzustellen, wie weit eine Ausgabe des Systems vom Goldstandard entfernt liegt. Insbesondere hat eine korrekte Ausgabe des Systems also immer einen Distanz-Wert von $0$
 \end{itemize}
-Ebenso wurde zusammen mit den Trainingsdaten ein Baseline-System ausgeliefert, das als Richtwert dient und von dem wir es uns zum Ziel genommen haben, die Accuracy zu schlagen und besser als die Baseline abzuschneiden.\todo[inline]{doppelt und dreifach gemoppelt imho, Baseline quasi == Richtwert, Accuracy schlagen == besser abschneiden. Besser so etwas wie ''Wir haben es uns zum Ziel genommen, mit unseren Ergebnissen in möglichst vielen Sprachen und möglichst weit über denen des Baseline-Systems zu liegen.''}
+Ebenso wurde zusammen mit den Trainingsdaten ein Baseline-System ausgeliefert, das als Richtwert dient und von dem wir es uns zum Ziel genommen haben, in möglichst vielen verschiedenen Sprachen möglichst weit darüber zu liegen.
 Das Baseline-System wird in \autoref{sec:baseline} näher erläutert.
 
 Letzten Endes wurden alle Systeme der Teilnehmer nach ihrer Accuracy miteinander verglichen, und wir haben uns dabei mit unserer Abgabe im soliden Mittelfeld positioniert. Insbesondere haben wir unsere Zielsetzung weitestgehend erreicht, und bis auf vereinzelte Ausreißer (die unter \autoref{sec:results} noch diskutiert werden) die Werte der Baseline überboten.
@@ -111,9 +111,8 @@ Aufgabe 2 wurde von uns nicht bearbeitet. Sie behandelt Flexion im Kontext: In e
 
 % ?, Fynn
 Die Flexion als solche unterliegt als morphologischer Prozess in vielen Sprachen den grundlegenden Wortbildungsprozessen mit Affixen.
-Wörter in ihrer Grundform können zumeist in Wortstamm sowie Präfixe und Suffixe aufgeteilt werden.
-Diese \todo{Tabelle vom Paper rüberholen\\F: Welche Tabelle?} einzelnen Bestandteile werden wiederum angepasst.
-Allerdings gibt es auch mehrere Sprachen, die mit Infix und Ablaut statt oder zusätzlich zu Zirkumfix arbeiten.
+Wörter in ihrer Grundform können zumeist in Wortstamm sowie Präfixe und Suffixe aufgeteilt werden. Diese einzelnen Bestandteile werden wiederum angepasst.
+Allerdings gibt es auch mehrere Sprachen, die mit Infix und Ablaut anstatt von (oder zusätzlich zu!) Zirkumfixen arbeiten.
 \citep{inflection_seq}
 Letztendlich geschieht der Vorgang also auf Zeichen-Ebene, und auch die menschliche Intuition der Sprache funktioniert als zeichenweises Abändern des als Lemma gegebenen Wortes\todo{Beleg?}; es schien uns daher von Beginn an sinnvoll, diese Funktionsweise Zeichen für Zeichen in unserem System umzusetzen.
 
@@ -509,6 +508,8 @@ Für die finale Evaluation der Testdatensätze haben wir die beste Parameterkomb
 \section{Ergebnisse und Diskussion}
 \label{sec:results}
 
+\todo[inline]{Ist doch eigentlich ungeil, direkt unter eine sec Überschrift eine subsec zu packen?? Mir fällt leider kein knackiger Einleitungstext ein -- Gregor}
+
 \subsection{Eingereichte Ergebnisse}
 \label{sec:eingereichte_ergebnisse}
 
@@ -747,6 +748,11 @@ Um jenes Problem zu lösen, müsste der Decoder mittels \textit{soft-attention} 
 ggf. Eindrücke vom Schreiben / Veröffentlichen des Papers schildern?
 }
 
+Der Shared Task als solcher begann am 21. April 2018. An diesem Tag wurden die Trainings- und Development-Daten freigegeben und ein Baseline-System veröffentlicht, das es zu schlagen galt. (Siehe hierzu auch \autoref{sec:baseline}). Neun Tage später wurden die Datensätze in abschließender Version hochgeladen, und ein sogenannter \textit{Feature Freeze} markiert.
+Die Teilnahme am Shared Task selbst geschieht hiervon weitgehend unabhängig. So kann nun jeder Teilnehmer der Interesse an dem Thema zeigt, mit der Arbeit beginnen und ein System konzipieren und umsetzen. Die Teilnahme ist an keine verbindliche Anmeldung oder Kostenpauschale gebunden, und die Daten sind prinzipiell frei verfügbar. Darüber hinaus kann sich jeder motivierte Teilnehmer auf der SIGMORPHON Mailing-Liste eintragen, über die wichtige Informationen zum Shared Task kommuniziert werden.
+
+Die Deadline für das Einsenden von finalen Ergebnissen war zunächst für den 20. Juni angesetzt. Wir haben dabei grob angepeilt, diese auch einzuhalten, da der Termin -- eigentlich rein zufällig -- mit unseren Semesterwochen übereinstimmt. Als es zum Ende hin knapp wurde, hat man sich glücklicherweise entschieden, aufgrund eines Problems mit den \textit{surprise languages} noch wenige Tage zu warten und wir hatten somit bis zum 1. August Zeit. Schlussendlich hat es uns das ermöglicht, tatsächlich Ergebnisse einzusenden und zu unserer Überraschung auch nicht mal schlecht abzuschneiden.
+
 Die Beschreibung unseres Systems haben wir mit dem Titel \enquote{Finding the way from ä to a: Sub-character morphological inflection for the SIGMORPHON 2018 Shared Task}\footnote{abrufbar unter \url{https://arxiv.org/abs/1809.05742}} als Paper veröffentlicht.
 Pünktlich zur Frist der ersten Abgabe haben wir den ersten Entwurf des Papers anonymisiert am 15. August 2018 eingereicht.
 Am 23. August 2018 haben wir die Nachricht bekommen, dass das Paper akzeptiert wurde, sowie das Feedback zweier anonymer Kritiker erhalten.
@@ -780,6 +786,15 @@ Reviewer Confidence          & 5; 4          \\
 \label{tab:review}
 \end{table}
 
+\subsection{Poster-Präsentation auf der EMNLP}
+\label{sec:paper:emnlp}
+
+Nach dem Erfolg mit unserem Paper zum Workshop angenommen zu werden, stand die Frage im Raum ob man nicht ein Poster auf der EMNLP vorstellt. Dort würden auch alle anderen Teilnehmer ihre Arbeit präsentieren, und es bot sich somit die gute Gelegenheit in den wissenschaftlichen Austausch zu gehen und andere Menschen zu treffen, die sich mit dem selben Shared Task befasst haben.
+
+Nach etwas anfänglicher Skepsis haben wir den Schritt tatsächlich gewagt, und der Arbeitsbereich \texttt{NATS} hat sich dankenswerterweise sogar dazu bereit erklärt, uns finanziell zu unterstützen und die Reisekosten zu erstatten. Mit einem selbst erstellten Poster\footnote{Zum Zeitpunkt der Erstellung dieses Berichts hängt das Poster aktuell in Raum F-432} im Gepäck, welches die Inhalte des Papers erneut zusammenfasst und illustiert, ging es dann am 31. Oktober nach Brüssel.
+
+Dort stand die Teilnahme am Workshop jedem interessierten Zuhörer frei, und es kam zu vielen lehrreichen Austauschen mit den anderen Teilnehmern. Darüber hinaus waren sogar einige der Organisatoren des Shared Task anwesend, um die Auswertung zu präsentieren. Diese Erfahrungen haben die Projekt-Arbeitsphase fantastisch abgerundet, und dafür gesorgt dass wir jetzt auch in den \textit{Proceedings} der Konferenz zu finden sind.
+
 \section{Hindernisse und was wir daraus gelernt haben}
 \label{sec:takeaway}
 Wir haben früh angefangen, ein System zu bauen, das erst mal nur \enquote{funktioniert}, und anschließend dieses System ausgebaut und verändert. Dies führte auch dazu, dass die Struktur des Codes zunehmend chaotisch wurde, da wir anfangs mehr Zeit in neue Funktionen investiert haben als in die Pflege des bestehenden Codes. Daher war es zu einem Zeitpunkt nötig, den kompletten Code umzustrukturieren und zu aktualisieren, was sehr zeitaufwändig war. Für künftige Projekte ist es daher ratsam, früh die Struktur, die man am Ende haben möchte, festzulegen und das Projekt gleich dementsprechend aufzubauen. Dazu gehören auch beispielsweise Ordnerstrukturen für Ausgabedateien verschiedener Art (generierte Daten, Logs, Backups, Evaluation, Grafiken).
@@ -797,9 +812,10 @@ Ich habe einen sehr tiefen Enblick in die Architektur und den Umgang mit neurona
 Die Arbeit mit wissenschaftlicher Literatur fiel mir schon vor diesem Projekt nicht schwer, nun habe ich aber eine ganz neue Perspektive dadurch gewonnen selbst einmal solch eine Arbeit veröffentlicht zu haben. Das Publizieren war eine aufregende und bereichernde Erfahrung in meinem Projektverlauf.
 Trotzdem habe ich nach wie vor streckenweise Schwierigkeiten, Belege für etwas zu finden was ich "einfach weiß" weil ich es etwa in der Schule gelernt habe. Das hat mich aber letzten Endes nicht im großen Maßstab von der Arbeit abgehalten und wird auch weiterhin einfach ein normaler Lernprozess sein.
 
-Leider habe ich während der Ausarbeitung insbesondere im August immer wieder Rückschläge durch Krankheiten erlebt, vorranging weil ich empfindlich auf meine Reiseimpfungen reagiert habe. Umso mehr bin ich meinen Mitstreitern in der Projektgruppe dankbar, dass sie trotz meiner vielfachen Abwesenheiten gut weitergearbeitet haben und am Ball geblieben sind.
+Leider habe ich während der Ausarbeitung insbesondere im August immer wieder Rückschläge durch Krankheiten erlebt, vorranging weil ich empfindlich auf meine Reiseimpfungen reagiert habe. Umso mehr bin ich meinen Mitstreitern in der Projektgruppe dankbar, dass sie trotz meiner vielfachen Abwesenheiten gut weitergearbeitet haben und am Ball geblieben sind. Ich habe mich dann im Gegenzug bemüht, ein aussagekräftiges Poster zu gestalten und durch meine Teilnahme an der EMNLP-Konferenz in Brüssel unsere Ergebnisse auch jenseits der Universität in die Welt zu tragen.
 
-Mein wichtigstes und größtes Take-Away ist zweifelsohne eines im Bezug auf Gruppenarbeit und Projektplanung: Es kam in der Arbeitsphase immer wieder vor, dass jedes einzelne Mitglied (mich selbst eingeschlossen) "vor sich hingehamstert" hat. So sind wir zwar alle drei sehr motiviert an das Projekt gegangen und vom Wissensstand sehr qualifiziert, aber obgleich die Chemie in der Gruppe gepasst hat haben wir uns zu wenig zu gemeinsamen Sitzungen getroffen. Ich möchte mich im folgenden explizit \textbf{nicht} selbst ausschließen, wenn ich sage dass ich mehr Austausch zwischen allen Mitgliedern über die digitalen Kommunikationskanäle hinaus erwartet hatte. Immer wieder ist unsere Struktur darauf hinausgelaufen, dass jeder Teilnehmer sein eigenes "Spezialgebiet" hatte auf dem er sich auskennt und seine "eigene" Systemkomponente aktiv und motiviert entwickelt, aber dann der Blick in den Code der anderen Gruppenmitglieder nur Verwunderung auslöst und Fragezeichen aufploppen lässt.
+Mein wichtigstes und größtes Take-Away ist zweifelsohne eines im Bezug auf Gruppenarbeit und Projektplanung: Es kam in der Arbeitsphase immer wieder vor, dass jedes einzelne Mitglied (mich selbst eingeschlossen) "vor sich hingehamstert" hat. So sind wir zwar alle drei sehr motiviert an das Projekt gegangen und vom Wissensstand durchaus qualifiziert, aber obgleich die Chemie in der Gruppe gepasst hat haben wir uns zu wenig zu gemeinsamen Sitzungen getroffen. Ich möchte mich im Folgenden explizit \textbf{nicht} selbst ausschließen, wenn ich sage dass ich mehr Austausch zwischen allen Mitgliedern über die digitalen Kommunikationskanäle hinaus erwartet hatte. Immer wieder ist unsere Arbeitsteilung darauf hinausgelaufen, dass jeder Teilnehmer sein eigenes "Spezialgebiet" hatte auf dem er sich auskennt und seine "eigene" Systemkomponente aktiv und motiviert entwickelt, aber dann der Blick in den Code der anderen Gruppenmitglieder nur Verwunderung auslöst und Fragezeichen aufploppen lässt.
+
 TL;DR Es reicht nicht, drei kluge Köpfe die sich gut verstehen zusammen auf eine Aufgabe loszulassen. Vielmehr müssen Teilziele konkreter abgesteckt und Verantwortlichkeiten stärker verteilt werden.
 
 \section{Ausblick}
@@ -809,7 +825,9 @@ TL;DR Es reicht nicht, drei kluge Köpfe die sich gut verstehen zusammen auf ein
 
 Aufbauend auf dem bisherigen System könnten mehrere Verbesserungen an bestehenden Bestandteilen vorgenommen werden.
 Zum Einen können die neuen Features, also die Patches und der Enhancer, erweitert werden.
-\todo[inline]{Patches verbessern: verschiedene Schriftarten, mehr Sprachen abdecken}
+
+Um Patches weiter zu verbessern, sollte man in erster Linie die Abhängigkeit von einer konkreten Schriftart lösen. Eine mögliche Verbesserung besteht darin, Zeichen in mehreren Fonts zu rendern und auf fehlerhafte Darstellungen zu reagieren. So hat zum Beispiel das typische "Zeichen unbekannt"-Rechteck den Codepunkt \texttt{U+25A1}; wenn man dieses einmal absichtlich rendert und dann neue Zeichen abgleicht, kann man leicht erkennen welcher Schriftsatz an welcher Stelle Lücken aufweist.
+Die zweifelsfrei eleganteste Lösung ist jedoch der Umgang mit dem zuvor erläuterten NFD-Standard des Unicode-Konsortiums. Hier bietet sich die Möglichkeit, fernab jedweder konkreter Schriftarten eine generelle Repräsentation für die Zerlegung von Zeichen zu finden, und diese anhand ihrer Einzelteile in Patch-Klassen einzuordnen. Idealerweise kann man dieses System dann noch mit unserer grafischen Komponente kombinieren, um Redundanzen einzuführen und sich die beiden Systeme gegenseitig ergänzen zu lassen.
 
 Der Enhancer könnte ein besseres Sprachmodell benutzen, um beim Auffüllen der zufällig generierten Worte realistischere Zeichenketten zu erzeugen.
 Denkbar wären außerdem eine besondere Behandlung von Prä- und Suffixen, eine bessere Erkennung typischer Silben bzw. n-Gramme sowie das Verhindern von untypischen Buchstabenkombinationen.
