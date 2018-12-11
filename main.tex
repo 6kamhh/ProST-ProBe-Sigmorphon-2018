@@ -20,7 +20,9 @@
 \usepackage{algorithm}
 \usepackage{algorithmic}
 \usepackage[skip=4pt]{caption}
-\usepackage[hyperref]{acl2018}
+\usepackage[nohyperref]{acl2018}
+\usepackage[ngerman]{hyperref}
+\usepackage{xcolor}
 \usepackage{rotating}
 \usepackage{afterpage}
 \usepackage{pdflscape}
@@ -28,6 +30,11 @@
 \newcommand{\lang}[1]{\textit{#1}}
 \newcommand{\action}[1]{\texttt{#1}}
 \newcommand{\prostst}[0]{\emph{CoNLL--SIGMORPHON 2018 Shared Task}}
+
+% Geklaut aus der hyperref-Integration von acl2018.sty
+% Ich kann nicht auf deren Implementation zurückgreifen, weil \autoref sonst die falsche Sprache (Englisch) wählt
+\definecolor{darkblue}{rgb}{0, 0, 0.5}
+\hypersetup{colorlinks=true,citecolor=darkblue, linkcolor=darkblue, urlcolor=darkblue}
 
 \aclfinalcopy
 
@@ -42,7 +49,6 @@ Fynn Schröder\\
 (6808038)}
 
 \date{20.09.2018}
-\selectlanguage{ngerman}
 
 \begin{document}
 \maketitle
