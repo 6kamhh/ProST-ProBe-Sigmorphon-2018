@@ -27,6 +27,7 @@
 
 \newcommand{\lang}[1]{\textit{#1}}
 \newcommand{\action}[1]{\texttt{#1}}
+\newcommand{\prostst}[0]{\emph{CoNLL--SIGMORPHON 2018 Shared Task}}
 
 \aclfinalcopy
 
@@ -49,7 +50,7 @@ Fynn Schröder\\
 \pagenumbering{arabic}
 
 \begin{abstract}
-\todo[inline]{Abstrakte Zusammenfassung des Inhalts (in gewisser Weise auf Meta-Ebene). Vorwegnahme der \enquote{Ergebnisse}, wenn möglich}
+Im diesjährigen Projekt \textit{Sprachtechnologie} haben wir den \prostst~mit dem Title \enquote{Universal Morphological Reinflection} bearbeitet. Unser Arbeitsergebnis ist ein neuronales Netzwerk in Anlehnung an \citet{cluzh:MakarovRC17}, das wir um mehrere wichtige Kernfunktionen ergänzt haben. Besonders hervorzuheben ist dabei die Einbindung von grafischen Features noch unterhalb der Zeichen-Ebene, die wir in mehreren Konfigurationen auswerten und sprachübergreifend vergleichen. Als Erkenntnis kristallisiert sich dabei unsere anfängliche Intuition heraus, dass diese Zusatzinformationen auf einigen Sprachen helfen können, auf anderen aber auch absolut keinen Mehrwert liefern. Eine weitere Verbesserung der Ergebnisse erzielen wir überdies durch den Einsatz von \textit{Beam Decoding} auf den Vorhersage-Sequenzen.
 \end{abstract}
 
 \section{Einleitung und Aufgabenstellung}
@@ -59,7 +60,7 @@ Andere Sprachen unterliegen jedoch unterschiedlichen Flexionsparadigma, und somi
 
 \subsection{SIGMORPHON Shared Task}
 \label{sec:sub:shared_task}
-Die Arbeit entstand als Teil des \textit{CoNLL--SIGMORPHON 2018 Shared Task} von \citet{sigmorphon:st2018}. Er besteht aus zwei Aufgaben.  Für Aufgabe 1 wurden von der SIGMORPHON annotierte Daten in über 100 Sprachen veröffentlicht. Diese folgen dem UniMorph-Annotationsschema \citep{kirov:unimorph2018} und sind jeweils in bis zu drei verschieden Größenordnungen verfügbar, siehe \autoref{fig:training-volumes}. Sie bestehen pro Beispiel aus je einer Grundform (\textit{Lemma}), der flektierten Form (\textit{Flexion}) sowie den Eigenschaften (\textit{Features}) der flektierten Form; in \autoref{fig:german-declension} sind deutsche Beispiele dargestellt. Aufgabe ist es aus gegebenen Lemma und Features die Flexion zu generieren.
+Die Arbeit entstand als Teil des \textit{CoNLL--SIGMORPHON 2018 Shared Task} von \citet{sigmorphon:st2018}. Er besteht aus zwei Aufgaben: Für Aufgabe 1 wurden gemäß des \textit{UniMorph}-Standards \citep{kirov:unimorph2018} annotierte Daten in über 100 Sprachen veröffentlicht. Diese Datensätze sind dabei jeweils in bis zu drei verschieden Größenordnungen verfügbar, siehe \autoref{fig:training-volumes}. Sie bestehen pro Beispiel aus je einer Grundform (\textit{Lemma}), der flektierten Form (\textit{Flexion}) sowie den Eigenschaften (\textit{Features}) der flektierten Form; in \autoref{fig:german-declension} sind deutsche Beispiele dargestellt. Aufgabe ist es, aus einem gegebenen Lemma und einer dazugehörigen Menge an Features die flektierte Vollform zu generieren.
 
 \begin{table}[htb]
 \centering
