@@ -58,7 +58,7 @@ Fynn Schröder\\
 \pagenumbering{arabic}
 
 \begin{abstract}
-Im diesjährigen Projekt \textit{Sprachtechnologie} haben wir den \prostst~mit dem Title \enquote{Universal Morphological Reinflection} bearbeitet. Unser Arbeitsergebnis ist ein neuronales Netzwerk in Anlehnung an \citet{cluzh:MakarovRC17}, das wir um mehrere wichtige Kernfunktionen ergänzt haben. Besonders hervorzuheben ist dabei die Einbindung von grafischen Features noch unterhalb der Zeichen-Ebene, die wir in mehreren Konfigurationen auswerten und sprachübergreifend vergleichen. Als Erkenntnis kristallisiert sich dabei unsere anfängliche Intuition heraus, dass diese Zusatzinformationen auf einigen Sprachen helfen können, auf anderen aber auch absolut keinen Mehrwert liefern. Eine weitere Verbesserung der Ergebnisse erzielen wir überdies durch den Einsatz von \textit{Beam Decoding} auf den Vorhersage-Sequenzen.
+Im diesjährigen Projekt \textit{Sprachtechnologie} haben wir den \prostst~mit dem Title \enquote{Universal Morphological Reinflection} bearbeitet. Unser Arbeitsergebnis ist ein neuronales Netzwerk in Anlehnung an \citet{cluzh:MakarovRC17}, das wir um mehrere Kernfunktionen ergänzt haben. Hervorzuheben ist dabei die Einbindung von grafischen Features noch unterhalb der Zeichen-Ebene, die wir in mehreren Konfigurationen auswerten und sprachübergreifend vergleichen. Als Erkenntnis kristallisiert sich dabei unsere anfängliche Intuition heraus, dass diese Zusatzinformationen auf einigen Sprachen helfen können, auf anderen jedoch keinen Mehrwert liefern. Eine weitere Verbesserung der Ergebnisse erzielen wir überdies durch den Einsatz von \textit{Beam-Decoding}.
 \end{abstract}
 
 \section{Einleitung und Aufgabenstellung}
@@ -811,37 +811,35 @@ Mein wichtigstes und größtes Take-Away ist zweifelsohne eines im Bezug auf Gru
 TL;DR Es reicht nicht, drei kluge Köpfe die sich gut verstehen zusammen auf eine Aufgabe loszulassen. Vielmehr müssen Teilziele konkreter abgesteckt und Verantwortlichkeiten stärker verteilt werden. Trotzdem bin ich zufrieden und sehr stolz auf das Endergebnis, wobei die Teilnahme an der Konferenz das absolute Highlight war. Danke, NATS!
 
 \subsection{Fynn}
-% Automatisierung ist Trumpf
-% Habe meine Shell-Skripting Fähigkeiten enorm ausgebaut, inbs. im Hinblick auf Verteilung über mehrere Rechner
 Automatisierung ist Trumpf.
-Um Änderungen zur vermeintlichen Verbesserung schnell evaluieren zu können, ist es essenziell die Auswirkung einer einzelnen Anpassungen auf die Ergebnisse für alle Trainingsdaten verteilt über mehrere Rechner automatisiert bearbeiten zu lassen.
+Um Verbesserungen schnell evaluieren zu können, ist es essenziell die Ergebnisse für alle Trainingsdaten verteilt über mehrere Rechner automatisiert berechnen zu lassen.
 Das umfasst das Verteilen der Arbeitspakete, einsammeln der Ausgaben, deren Evaluation und die grafische Aufbereitung, um Effekte klar erkennen zu können.
 In diesem Rahmen habe ich meine Shell-Scripting-Fähigkeiten enorm ausgebaut, insbesondere im Hinblick auf die zuverlässige Verteilung über mehrere Rechner.
 
-% Unterschiedliche Erwartungen, wie viel wir machen (wollen), wie gut es werden soll, wie viel Zeit man investiert etc. innerhalb des Teams
-% Zeitgleiche Zusammenarbeit schwierig, wenn alle 3 nebenbei arbeiten und verschiedene Kurse haben - daraus resultierte strikte Trennung und wenig Wissensaustausch
+Retrospektiv gesehen, hatten wir im Team abweichende Erwartungen wie viel wir machen wollen bzw. wie viel Zeit man dafür investiert.
+Das hätten wir schon ggf. während der Gruppenfindung oder zum Start der Bearbeitung des Shared Tasks herausarbeiten sollen.
+Dabei half es wenig, dass sich die zeitgleiche, gemeinsame Zusammenarbeit als schwierig gestaltete und effektiv auf die Stunden während der offiziellen Projekt-Zeiten beschränkte.
+Es ließen sich keine passenden Zeiten finden, da wir alle nebenbei gearbeitet haben und zusätzlich unterschiedliche Kurse besucht haben.
+Daraus resultierte eine relativ strikte Trennung bei der Aufgabenverteilung und reduzierter Wissensaustausch, auch wenn wir versucht haben, die Stunden am Donnerstag vorrangig dafür zu verwenden, den anderen Gruppenmitgliedern das eigene Werk der letzten Woche zu erklären.
 
-Retrospektiv gesehen, hatten wir im Team abweichende Erwartungen wie viel wir machen wollen, wie gut unser System werden soll und wie viel Zeit man dafür investiert.
-Das hätten wir schon ggf. während der Gruppenfindung oder spätestens zum Start der Bearbeitung des Shared Tasks herausarbeiten sollen.
-Dabei half es wenig, dass sich die zeitgleiche, gemeinsame Zusammenarbeit als schwierig gestaltete und effektiv auf die Stunden während der offiziellen Projekt-Zeiten beschränkte. Es ließen sich keine passenden Zeiten finden, da wir alle nebenbei gearbeitet haben und zusätzlich unterschiedliche Kurse besucht haben.
-Daraus resultierte eine relativ strikte Trennung bei der Aufgabenverteilung und verringerter Wissensaustausch, auch wenn wir versucht haben, die Stunden am Donnerstag während der Projekt-Zeiten vorrangig dafür zu verwenden, den anderen Gruppenmitgliedern das eigene Werk der letzten Woche zu erklären.
+Während der Entwicklung unseres Systems habe ich ein tiefgehendes Verständnis neuronaler Netze erlangt, wie es keine Vorlesung geschafft hat -- insbesondere die Verarbeitung dynamischer Sequenzen, Einbau von nicht-Standard Komponenten wie des Transduktors sowie das Einbringen und Ummünzen anderer Ideen (globale Normalisierung $\to$ eigene Loss-Funktion, Beam-Decoding etc.) auf das eigene neuronales Netz waren klasse Erfahrungen.
+Es hat mir dabei viel Spaß gemacht, das Netzwerk zu verbessern, um noch ein paar Prozentpunkte mehr herauszuholen.
+Das erlangte Verständnis hat mir seitdem schon öfter geholfen neue Paper zu verstehen und wird mir auch Zukunft behilflich sein.
 
-% Anwenden / selber Entwickeln von NNs gibt tiefgegehndes Verständis, was keine Vorleseung schafft - insb. Sequenz-Verarb., einbau anderer Nicht-standard komponenten wie Transducer sowie Einbringen und Ummünzen anderer Ideen auf das eigene NN waren klasse Erfahrungen (GLobalNorm., eigene Loss-Fkt, Beam-Dec), wird mir in Zukunft injedem Fall behilflich sein, bzw. war schon beim Lesen von Papern seitdem
-% Es hat viel Spaß gemacht, das System zu verbessern, um noch ein paar Prozentonukte mehr herauszuholen
-% Python mit PyTorch erlaubt schnelles Entwickeln + gutes Debugging
-% Eine typisierte & kompilierte Sprache ziehe ich Python ab einem gewissen Umfang ganz klar vor (ich weiß, dass Python sowohl typisiert, als auch kompiliert werden kann, aber das hilft bei den verwendeten Libs auch nicht)
-% Ein Paper zu veröffentlichen ist so wie Arbeit wie erwaret.. aber sehr cool, wenn es geschafft ist
-% Wissenschaftliche Literaturarbeit kann ewig dauern, wenn man Quellen von Quellen liest.. aber man stößt dabei auf spannende Aspekte
-% Im Rahmen der Seminararbeit habe ich mir umfassendes, detailliertes Wissen über Morp. in CL erarbeitet, Prinzip und Gründe für Unterschiedliche Verfahren und Resultete 
-\todo[inline]{Weitere Inhalte ausformulieren}
+% Auch wenn Python mit PyTorch schnelle Entwicklung und gutes Debugging bietet, wäre für mich eine typisierte und kompilierte Sprache ab einem gewissen Umfang deutlich von Vorteil gewesen -- die optionale Typisierung und Kompilierung bringt bei den eingesetzten Bibliotheken nur wenig.
+
+Ein Paper selbst zu veröffentlichen ist so viel Arbeitet wie erwartet -- aber wahnsinnig cool, wenn das Werk vollbracht ist!
+Im Rahmen von Projekt und Seminar habe ich mir viel Wissen über Morphologie in der Computer Linguistik angeeignet.
+Dabei habe ich festgestellt, dass wissenschaftliche Literaturarbeit ewig dauern kann, wenn man die Quellen von Quellen liest, man dafür aber immer wieder auf neue, spannende Aspekte stößt.
+
 
 \subsection{Marcel}
 \todo[inline]{Inhalt :-D}
 
 \section{Ausblick}
 \label{sec:future_work}
-\todo[inline]{F: Wir könnten hier wohl auf die Unterüberschriften verzichten}
-\subsection{Mögliche Verbesserungen}
+%\todo[inline]{F: Wir könnten hier wohl auf die Unterüberschriften verzichten}
+%\subsection{Mögliche Verbesserungen}
 
 Aufbauend auf dem bisherigen System könnten mehrere Verbesserungen an bestehenden Bestandteilen vorgenommen werden.
 Zunächst können die neuen Features, also die Patches und der Enhancer, erweitert werden.
@@ -866,7 +864,7 @@ Durch ein derartiges Vorgehen sollte das Netzwerk sich besser in beliebigen Zust
 
 % Letztendlich sollten weitere Parameterkombinationen getestet werden, um die Beste Kombination zu finden. Auch bisher ungetestete Werte für die einzelnen Parameter sollten in Betracht gezogen werden.
 
-\subsection{Weitere Anwendungsmöglichkeiten}
+%\subsection{Weitere Anwendungsmöglichkeiten}
 
 Darüber hinaus wäre es interessant zu sehen, welche weiteren Möglichkeiten der Anwendung man abseits der Aufgabe erforschen könnte. Beispielsweise könnte man Experimente durchführen um zu beobachten, ob es einen Zugewinn an Genauigkeit gibt wenn man das System auf mehr als einer Sprache gleichzeitig trainiert. Denkbar wäre es, hier die Sprache als weiteres Feature anzuhängen, sowie entweder nur auf Sprachen derselben Familie zu trainieren, oder Sprachfamilie und gegebenenfalls andere Eigenschaften der Sprache als Features anzugeben. Unter der Annahme, dass Flexionen innerhalb einer Sprachfamilie ähnlich verlaufen, könnten so aus anderen Sprachen korrekte Regeln gelernt und übertragen werden. So könnten Sprachen mit nur geringen Daten trotzdem relativ gut flektiert werden, sofern andere Sprachen derselben Sprachfamilie bekannt sind.
 
