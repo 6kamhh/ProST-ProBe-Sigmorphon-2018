@@ -677,7 +677,8 @@ Gegenüber dem Durchschnitt der anderen Teilnehmer fällt unser Vorsprung auf \t
 \subsection{Effekt von Patches und Enhancer}
 \todo[inline]{Effekt von Patches}
 
-Auf die niedrige Datenmenge bezogen verbesserte der künstlich erweiterte Datensatz (bestes Ergebnis von \times 1 und \times 5) die Accuracy von insgesamt 42 Datensätzen. Die Wahrscheinlichkeit, dass dies zufällige Beobachtungen sind, liegt bei \todo{die Zitation hat ja nicht den Wert berechnet, das sollte man anders formulieren}$0.3049$ \citep{biostat:zar}. Der durchschnittliche Effekt über alle Sprachen beträgt $+1.3\%$, die maximale Verbesserung konnte mit $+10.8\%$ auf \lang{french} erreicht werden.
+Auf die niedrige Datenmenge bezogen verbesserte der künstlich erweiterte Datensatz (bestes Ergebnis von \times 1 und \times 5) die Accuracy von insgesamt 42 Datensätzen. Die Wahrscheinlichkeit, dass dies zufällige Beobachtungen sind (nach \citet{biostat:zar}), liegt bei $0.3049$. Der durchschnittliche Effekt über alle Sprachen beträgt $+1.3\%$, die maximale Verbesserung konnte mit $+10.8\%$ auf \lang{french} erreicht werden.
+\todo{die Zitation hat ja nicht den Wert berechnet, das sollte man anders formulieren. M: Geändert}
 
 \subsection{Effekt Beam-Decoding}
 \label{sec:beam-results}
@@ -798,26 +799,14 @@ Darüber hinaus haben wir gelernt, wie wichtig Automatisierung ist. Da wir unser
 Eine weitere wichtige Erfahrung ist, wie wichtig Zeitpuffer und Alternativpläne sind, um auf mögliche unvorhergesehene Probleme vorbereitet zu sein. Beispielsweise haben wir unsere finalen Ergebnisse relativ kurz vor Ablauf der ersten Frist inmitten einer Hitzewelle in Hamburg berechnen lassen, was zur Folge hatte, dass die Server, die wir nutzen wollten, wegen eines Ausfalls der Kühlungsanlage abgeschaltet wurden. Wir mussten daher kurzzeitig auf andere, weniger leistungsstarke Server ausweichen:
 \foreignquote{english}{\textit{[hummel-users] The sun is killing us (operations down due to cooling system failure)}}
 
-\subsection{Gregor}
-Ich habe einen sehr tiefen Enblick in die Architektur und den Umgang mit neuronalen Netzen auch im praktischen Anwendungskontext erhalten. Ich fühle mich sicherer bei der Arbeit mit Python-Projekten und insbesondere der PyTorch-Bibliothek.
-
-Die Arbeit mit wissenschaftlicher Literatur fiel mir schon vor diesem Projekt nicht schwer, nun habe ich aber eine ganz neue Perspektive dadurch gewonnen selbst einmal solch eine Arbeit veröffentlicht zu haben. Das Publizieren war eine aufregende und bereichernde Erfahrung in meinem Projektverlauf.
-Trotzdem habe ich nach wie vor streckenweise Schwierigkeiten, Belege für etwas zu finden was ich \enquote{einfach weiß} weil ich es etwa in der Schule gelernt habe. Das hat mich aber letzten Endes nicht im großen Maßstab von der Arbeit abgehalten und wird auch weiterhin einfach ein normaler Lernprozess sein.
-
-Leider habe ich während der Ausarbeitung insbesondere im August immer wieder Rückschläge durch Krankheiten erlebt, vorranging weil ich empfindlich auf meine Reiseimpfungen reagiert habe. Umso mehr bin ich meinen Mitstreitern in der Projektgruppe dankbar, dass sie trotz meiner vielfachen Abwesenheiten gut weitergearbeitet haben und am Ball geblieben sind. Ich habe mich dann im Gegenzug bemüht, ein aussagekräftiges Poster zu gestalten und durch meine Teilnahme an der EMNLP-Konferenz in Brüssel unsere Ergebnisse auch jenseits der Universität in die Welt hinaus zu tragen.
-
-Mein wichtigstes und größtes Take-Away ist zweifelsohne eines im Bezug auf Gruppenarbeit und Projektplanung: Es kam in der Arbeitsphase immer wieder vor, dass jedes einzelne Mitglied (mich selbst eingeschlossen) \enquote{vor sich hingehamstert} hat. So sind wir zwar alle drei sehr motiviert an das Projekt gegangen und vom Wissensstand durchaus qualifiziert, aber obgleich die Chemie in der Gruppe gepasst hat haben wir uns zu wenig zu gemeinsamen Sitzungen getroffen. Ich möchte mich im Folgenden explizit \textbf{nicht} selbst ausschließen, wenn ich sage dass ich mehr Austausch zwischen allen Mitgliedern über die digitalen Kommunikationskanäle hinaus erwartet hatte. Immer wieder ist unsere Arbeitsteilung darauf hinausgelaufen, dass jeder Teilnehmer sein eigenes \enquote{Spezialgebiet} hatte auf dem er sich auskennt und seine \enquote{eigene} Systemkomponente aktiv und motiviert entwickelt, aber dann der Blick in den Code der anderen Gruppenmitglieder nur Verwunderung auslöst und Fragezeichen aufploppen lässt.
-
-TL;DR Es reicht nicht, drei kluge Köpfe die sich gut verstehen zusammen auf eine Aufgabe loszulassen. Vielmehr müssen Teilziele konkreter abgesteckt und Verantwortlichkeiten stärker verteilt werden. Trotzdem bin ich zufrieden und sehr stolz auf das Endergebnis, wobei die Teilnahme an der Konferenz das absolute Highlight war. Danke, NATS!
-
 \subsection{Fynn}
 Automatisierung ist Trumpf.
 Um Verbesserungen schnell evaluieren zu können, ist es essenziell die Ergebnisse für alle Trainingsdaten verteilt über mehrere Rechner automatisiert berechnen zu lassen.
 Das umfasst das Verteilen der Arbeitspakete, einsammeln der Ausgaben, deren Evaluation und die grafische Aufbereitung, um Effekte klar erkennen zu können.
 In diesem Rahmen habe ich meine Shell-Scripting-Fähigkeiten enorm ausgebaut, insbesondere im Hinblick auf die zuverlässige Verteilung über mehrere Rechner.
 
-Retrospektiv gesehen, hatten wir im Team abweichende Erwartungen wie viel wir machen wollen bzw. wie viel Zeit man dafür investiert.
-Das hätten wir schon ggf. während der Gruppenfindung oder zum Start der Bearbeitung des Shared Tasks herausarbeiten sollen.
+Retrospektiv hatten wir im Team abweichende Erwartungen wie viel wir machen wollen bzw. wie viel Zeit man dafür investiert.
+Das hätten wir schon gegebenenfalls während der Gruppenfindung oder zum Start der Bearbeitung des Shared Tasks herausarbeiten sollen.
 Dabei half es wenig, dass sich die zeitgleiche, gemeinsame Zusammenarbeit als schwierig gestaltete und effektiv auf die Stunden während der offiziellen Projekt-Zeiten beschränkte.
 Es ließen sich keine passenden Zeiten finden, da wir alle nebenbei gearbeitet haben und zusätzlich unterschiedliche Kurse besucht haben.
 Daraus resultierte eine relativ strikte Trennung bei der Aufgabenverteilung und reduzierter Wissensaustausch, auch wenn wir versucht haben, die Stunden am Donnerstag vorrangig dafür zu verwenden, den anderen Gruppenmitgliedern das eigene Werk der letzten Woche zu erklären.
@@ -832,9 +821,26 @@ Ein Paper selbst zu veröffentlichen ist so viel Arbeitet wie erwartet -- aber w
 Im Rahmen von Projekt und Seminar habe ich mir viel Wissen über Morphologie in der Computer Linguistik angeeignet.
 Dabei habe ich festgestellt, dass wissenschaftliche Literaturarbeit ewig dauern kann, wenn man die Quellen von Quellen liest, man dafür aber immer wieder auf neue, spannende Aspekte stößt.
 
-
 \subsection{Marcel}
-\todo[inline]{Inhalt :-D}
+Insgesamt war die Projektarbeit sehr lehrreich. Zunächst einmal war es sehr verlockend -- und der Verlockung sind wir verfallen -- anfangs \enquote{drauf los zu programmieren}. Wir haben darauf geachtet, einzelne Bausteine zu bauen, die gut miteinander funktionieren und notfalls austauschbar sind, ohne auf zu sehr spezialisierte Schnittstellen angewiesen zu sein. Leider fiel dies zulasten einer geplanten Struktur. Diese Struktur nachträglich zu bauen kostete einige Zeit, da nicht nur die Strukturierung an sich aufwändig war, sondern auch die Behebung von Fehlern, die daraus entstanden sind. Obwohl wir uns schon im Vornherein viele Gedanken über Struktur, Aufbau und Modularität des Systems Gedanken gemacht haben, hat mir das gezeigt, dass wir noch lange nicht genug Zeit in diese Planung gesteckt haben. Die geplante Struktur muss auch gut dokumentiert werden. Kleine Abweichungen können zu späteren Zeitpunkten große Auswirkungen haben.
+
+Diese Struktur fehlte auch in der Speicherung von Ausgaben und Evaluationen. Dies lag nicht zwingend an mangelndem Willen, sondern vor allem daran, dass die Ausgabe teilweise sehr groß war und es meistens nicht für alle nötig war, sie lokal zu speichern, es fehlte dann aber manchmal die Möglichkeit, beispielsweise ein Set an Hyperparametern zu evaluieren, da die Daten einfach gerade nicht verfügbar waren. Das Konstrukt Ausgabe -- Evaluation der Ausgabe -- Evaluation der Evaluationen war meist auf mehrere Rechner verteilt, was nachträgliche Fehlersuche und Erkennung von Zusammenhängen behinderte. Diese Problemstellung ist auf jeden Fall eine, die ich bei weiteren Projekten deutlich stärker beachten und früher planen werde.
+
+Das Projekt erstreckte sich über einen längeren Zeitraum, sodass verschiedene Umstände der Gruppenmitglieder aufkamen. Längere geplante wie plötzliche Abwesenheit durch Urlaub oder Krankheit hatten ihren Einfluss ebenso wie Berufstätigkeit und Semesterferien, sodass verschiedene Gruppenmitglieder streckenweise mehr oder weniger Zeit investieren konnten. Mit diesen Umständen wie spontanen \enquote{Ausfällen} umzugehen und längere Abwesenheiten oder Zeiträume, in denen jemand mehr Zeit investieren kann, zu planen ist etwas, deren Wichtigkeit das Projekt gezeigt hat. Insbesondere ist es manchmal für alle Gruppenmitglieder von Nachteil, wenn einer (wie ich) als Teilzeitstudent zusätzlich berufstätig ist und seine Zeit deutlich eingeschränkt einteilen kann.
+
+Zusätzlich zur Erfahrung in der Projektplanung und Gruppenarbeit hat mir dieses Projekt die behandelten Themen näher gebracht als je etwas zuvor, und gleichzeitig die Komplexität und Vielseitigkeit derer aufgezeigt. Außerdem konnte ich viel über Python, was ich zuvor nur selten nutzen konnte, Scripting, PyTorch sowie neuronale Netze im Allgemeinen lernen. Darüber hinaus war das Erstellen eines Papers, das offiziell eingereicht und veröffentlicht wird, höchst spannend, aufregend und ungemein zufriedenstellend -- übertroffen nur von dem Gefühl, wenn die Ergebnisse des Systems zum größten Teil nicht nur über den eigenen Erwartungen, sondern auch über der Baseline und dem Durchschnitt der Teilnehmer des Shared Tasks liegen!
+
+\subsection{Gregor}
+Ich habe einen sehr tiefen Enblick in die Architektur und den Umgang mit neuronalen Netzen auch im praktischen Anwendungskontext erhalten. Ich fühle mich sicherer bei der Arbeit mit Python-Projekten und insbesondere der PyTorch-Bibliothek.
+
+Die Arbeit mit wissenschaftlicher Literatur fiel mir schon vor diesem Projekt nicht schwer, nun habe ich aber eine ganz neue Perspektive dadurch gewonnen selbst einmal solch eine Arbeit veröffentlicht zu haben. Das Publizieren war eine aufregende und bereichernde Erfahrung in meinem Projektverlauf.
+Trotzdem habe ich nach wie vor streckenweise Schwierigkeiten, Belege für etwas zu finden was ich \enquote{einfach weiß} weil ich es etwa in der Schule gelernt habe. Das hat mich aber letzten Endes nicht im großen Maßstab von der Arbeit abgehalten und wird auch weiterhin einfach ein normaler Lernprozess sein.
+
+Leider habe ich während der Ausarbeitung insbesondere im August immer wieder Rückschläge durch Krankheiten erlebt, vorrangig weil ich empfindlich auf meine Reiseimpfungen reagiert habe. Umso mehr bin ich meinen Mitstreitern in der Projektgruppe dankbar, dass sie trotz meiner vielfachen Abwesenheiten gut weitergearbeitet haben und am Ball geblieben sind. Ich habe mich dann im Gegenzug bemüht, ein aussagekräftiges Poster zu gestalten und durch meine Teilnahme an der EMNLP-Konferenz in Brüssel unsere Ergebnisse auch jenseits der Universität in die Welt hinaus zu tragen.
+
+Mein wichtigstes und größtes Take-Away ist zweifelsohne eines im Bezug auf Gruppenarbeit und Projektplanung: Es kam in der Arbeitsphase immer wieder vor, dass jedes einzelne Mitglied (mich selbst eingeschlossen) \enquote{vor sich hingehamstert} hat. So sind wir zwar alle drei sehr motiviert an das Projekt gegangen und vom Wissensstand durchaus qualifiziert, aber obgleich die Chemie in der Gruppe gepasst hat, haben wir uns zu wenig zu gemeinsamen Sitzungen getroffen. Ich möchte mich im Folgenden explizit \textbf{nicht} selbst ausschließen, wenn ich sage, dass ich mehr Austausch zwischen allen Mitgliedern über die digitalen Kommunikationskanäle hinaus erwartet hatte. Immer wieder ist unsere Arbeitsteilung darauf hinausgelaufen, dass jeder Teilnehmer sein eigenes \enquote{Spezialgebiet} hatte auf dem er sich auskennt und seine \enquote{eigene} Systemkomponente aktiv und motiviert entwickelt, aber dann der Blick in den Code der anderen Gruppenmitglieder nur Verwunderung auslöst und Fragezeichen aufploppen lässt.
+
+TL;DR Es reicht nicht, drei kluge Köpfe die sich gut verstehen zusammen auf eine Aufgabe loszulassen. Vielmehr müssen Teilziele konkreter abgesteckt und Verantwortlichkeiten stärker verteilt werden. Trotzdem bin ich zufrieden und sehr stolz auf das Endergebnis, wobei die Teilnahme an der Konferenz das absolute Highlight war. Danke, NATS!
 
 \section{Ausblick}
 \label{sec:future_work}
