@@ -675,9 +675,13 @@ Gegenüber dem Durchschnitt der anderen Teilnehmer fällt unser Vorsprung auf \t
 
 
 \subsection{Effekt von Patches und Enhancer}
-\todo[inline]{Effekt von Patches}
+Das von uns konzipierte System berechnet eine aussagekräftige Lookup-Tabelle mit Patches für etwa eine Drittel aller Sprachen. Die Formulierung \enquote{aussagekräftig} bezieht sich dabei auf die Tatsache, dass erst eine Patch-Tabelle mit mehr als einem Eintrag ein tatsächliches Verbesserungspotenzial bietet -- andernfalls steht dem \action{PATCH}-Operator ohnehin nur ein einziger Operand zur Verfügung und die Wirkung unterscheidet sich nicht von einem zusätzlichen \action{EMIT}. Diese Abdeckung könnte man noch weiter ausbauen gemäß der Ideen die wir in \autoref{sec:future_work} diskutieren; innerhalb der Parameter unserer Projektarbeit scheint das bisherige Ergebnis aber äußerst passabel.
 
-Auf die niedrige Datenmenge bezogen verbesserte der künstlich erweiterte Datensatz (bestes Ergebnis von \times 1 und \times 5) die Accuracy von insgesamt 42 Datensätzen. Die Wahrscheinlichkeit, dass dies zufällige Beobachtungen sind, liegt bei \todo{die Zitation hat ja nicht den Wert berechnet, das sollte man anders formulieren}$0.3049$ \citep{biostat:zar}. Der durchschnittliche Effekt über alle Sprachen beträgt $+1.3\%$, die maximale Verbesserung konnte mit $+10.8\%$ auf \lang{french} erreicht werden.
+Von den $42$ Sprachen mit (aussagekräftigen, s.o.) Patches hat sich die Anwendung in nur $17$ Fällen bei der Hyperparameter-Suche auf \textit{low} bewährt. Das resultierende Ergebnis von $\frac{17}{42} = 40,4\%$ deutet zwar auf einen vernachlässigbar kleinen bis gar keinen globalen Effekt hin, der Anteil steigt aber auf $\frac{29}{42} = 69\%$ wenn auf dem \textit{medium}-Datensatz trainiert wird.
+
+Mit anderen Worten: Der Nutzen von Patches steigt bei größerer Datenmenge deutlich an. Dabei unterscheidet sich aber die Auswahl von Sprachen, die die Patches tatsächlich nutzen teilweise. Nur etwas mehr als die Hälfte aller Patch-Sprachen auf \textit{low} nutzt die Patches auch auf \textit{medium}, daher muss man besonders auf linguistisches Hintergrundwissen zurückgreifen anstatt diese Patches blindlings als \enquote{Wunderwaffe} überall anzuwenden wo nur möglich.
+
+Auf die niedrige Datenmenge bezogen verbesserte der künstlich erweiterte Datensatz (bestes Ergebnis von \times 1 und \times 5) die Accuracy von insgesamt 42 Datensätzen. Die Wahrscheinlichkeit, dass dies zufällige Beobachtungen sind \citep{biostat:zar}, liegt bei $0.3049$. Der durchschnittliche Effekt über alle Sprachen beträgt $+1.3\%$, die maximale Verbesserung konnte mit $+10.8\%$ auf \lang{french} erreicht werden.
 
 \subsection{Effekt Beam-Decoding}
 \label{sec:beam-results}
@@ -783,7 +787,7 @@ Reviewer Confidence          & 5; 4          \\
 
 Nach dem Erfolg mit unserem Paper zum Workshop angenommen zu werden, stand die Frage im Raum ob man nicht ein Poster auf der EMNLP vorstellt. Dort würden auch alle anderen Teilnehmer ihre Arbeit präsentieren, und es bot sich somit die gute Gelegenheit in den wissenschaftlichen Austausch zu gehen und andere Menschen zu treffen, die sich mit dem selben Shared Task befasst haben.
 
-Nach etwas anfänglicher Skepsis haben wir den Schritt tatsächlich gewagt, und der Arbeitsbereich \texttt{NATS} hat sich dankenswerterweise sogar dazu bereit erklärt, uns finanziell zu unterstützen und die Reisekosten zu erstatten. Mit einem selbst erstellten Poster\footnote{Zum Zeitpunkt der Erstellung dieses Berichts hängt das Poster aktuell in Raum F-432} \todo{Poster verlinken/in den Anhang?} im Gepäck, welches die Inhalte des Papers erneut zusammenfasst und illustiert, ging es dann am 31. Oktober nach Brüssel.
+Nach etwas anfänglicher Skepsis haben wir den Schritt tatsächlich gewagt, und der Arbeitsbereich \texttt{NATS} hat sich dankenswerterweise sogar dazu bereit erklärt, uns finanziell zu unterstützen und die Reisekosten zu erstatten. Mit einem selbst erstellten Poster\footnote{Zum Zeitpunkt der Erstellung dieses Berichts hängt das Poster aktuell in Raum F-432} im Gepäck, welches die Inhalte des Papers erneut zusammenfasst und illustiert, ging es dann am 31. Oktober nach Brüssel. Eine verkleinerte Abbildung findet sich im Anhang als \autoref{app:poster}.
 
 Dort stand die Teilnahme am Workshop jedem interessierten Zuhörer frei, und es kam zu vielen lehrreichen Diskussionen mit den anderen Teilnehmern. Darüber hinaus waren sogar einige der Organisatoren des Shared Task anwesend, um die Auswertung zu präsentieren. Diese Erfahrungen haben die Projekt-Arbeitsphase fantastisch abgerundet, und dafür gesorgt dass wir jetzt auch in den \textit{Proceedings} der Konferenz zu finden sind.
 
@@ -874,5 +878,11 @@ Eine weitere denkbare Anwendung ist die Übersetzung. Dies würde wahrscheinlich
 \bibliographystyle{acl_natbib}
 
 \appendix
+\begin{figure*}
+	\centering
+	\includegraphics[width=\textwidth]{poster-emnlp.pdf}
+	\caption{Das Poster welches auf dem SIGMORPHON Workshop zur EMNLP-Konferenz 2018 präsentiert wurde}
+	\label{app:poster}
+\end{figure*}
 
 \end{document}
