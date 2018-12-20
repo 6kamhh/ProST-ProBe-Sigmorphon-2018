@@ -58,13 +58,13 @@ Fynn Schröder\\
 \pagenumbering{arabic}
 
 \begin{abstract}
-Im diesjährigen Projekt \textit{Sprachtechnologie} haben wir den \prostst~mit dem Title \enquote{Universal Morphological Reinflection} bearbeitet. Unser Arbeitsergebnis ist ein neuronales Netzwerk in Anlehnung an \citet{cluzh:MakarovRC17}, das wir um mehrere Kernfunktionen ergänzt haben. Hervorzuheben ist dabei die Einbindung von grafischen Features noch unterhalb der Zeichen-Ebene, die wir in mehreren Konfigurationen auswerten und sprachübergreifend vergleichen. Als Erkenntnis kristallisiert sich dabei unsere anfängliche Intuition heraus, dass diese Zusatzinformationen auf einigen Sprachen helfen können, auf anderen jedoch keinen Mehrwert liefern. Eine weitere Verbesserung der Ergebnisse erzielen wir überdies durch den Einsatz von \textit{Beam-Decoding}.
+Im diesjährigen\todo{M: ist ''diesjährig'' angemessen?} Projekt \textit{Sprachtechnologie} haben wir den \prostst~mit dem Title \enquote{Universal Morphological Reinflection} bearbeitet. Unser Arbeitsergebnis ist ein neuronales Netzwerk in Anlehnung an \citet{cluzh:MakarovRC17}, das wir um mehrere Kernfunktionen ergänzt haben. Hervorzuheben ist dabei die Einbindung von grafischen Features noch unterhalb der Zeichen-Ebene, die wir in mehreren Konfigurationen auswerten und sprachübergreifend vergleichen. Als Erkenntnis kristallisiert sich dabei heraus, dass diese Zusatzinformationen auf einigen Sprachen helfen können, auf anderen jedoch keinen Mehrwert liefern. Eine weitere Verbesserung der Ergebnisse erzielen wir überdies durch den Einsatz von \textit{Beam-Decoding} und der künstlichen Erweiterung des Trainingsdatensatzes.
 \end{abstract}
 
 \section{Einleitung und Aufgabenstellung}
 \label{sec:introduction}
 In diesem Projekt haben sich die Autoren mit Flexion, also dem morphologischen Prozess der Wortbildung durch Anpassung an die grammatische Funktion innerhalb des Satzes, befasst. Im Deutschen bezeichnet dies üblicherweise die Deklination von Substantiven und Adjektiven nach Kasus, Numerus und Genus sowie die Konjugation von Verben.
-Andere Sprachen unterliegen jedoch unterschiedlichen Flexionsparadigma, und somit wurde von Anfang an darauf geachtet, ein möglichst sprach-unabhängiges System zu entwerfen das in der Lage ist, die tatsächlichen Strukturen einer Vielzahl von Beispielsprachen zu lernen und anwenden zu können.
+Andere Sprachen unterliegen jedoch unterschiedlichen Flexionsparadigmen, und somit wurde von Anfang an darauf geachtet, ein möglichst sprach-unabhängiges System zu entwerfen das in der Lage ist, die tatsächlichen Strukturen einer Vielzahl von Beispielsprachen zu lernen und anwenden zu können.
 
 \subsection{SIGMORPHON Shared Task}
 \label{sec:sub:shared_task}
@@ -97,17 +97,17 @@ Vogel & Vögeln & N;DAT;PL\\
 Milchkuh & Milchkühen & N;DAT;PL\\
 \bottomrule
 \end{tabular}
-\caption{Beispiel-Tupel aus dem Trainingsdatensatz \lang{German}}
+\caption{Beispiel-Tupel aus dem Trainingsdatensatz \lang{german}}
 \label{fig:german-declension}
 \end{table}
 
 Erst kurz vor Ende der Entwicklungszeit wurde dann ein Test-Set veröffentlicht, auf dem es gilt eine möglichst hohe Accuracy zu erreichen.
-Wir haben es uns darüber hinaus als Ziel gesetzt, die Levenshtein-Distanz der Ausgabe zu minimieren. Es wurden zur offiziellen Bewertung der Qualität der Ergenisse nämlich zwei verschiedene Metriken angewandt:
+Wir haben es uns darüber hinaus als Ziel gesetzt, die Levenshtein-Distanz der Ausgabe zu minimieren. Es wurden zur offiziellen Bewertung der Qualität der Ergebnisse nämlich zwei verschiedene Metriken angewandt:
 \begin{itemize}
     \item \textbf{Accuracy} als Standardmaß von korrekten Ausgaben im Verhältnis zu allen Ausgaben des Systems insgesamt
-    \item \textbf{Levenshtein-Distanz} gemäß der klassischen Definition von \citet{levenshtein:binary66} um festzustellen, wie weit eine Ausgabe des Systems vom Goldstandard entfernt liegt. Insbesondere hat eine korrekte Ausgabe des Systems also immer einen Distanz-Wert von $0$
+    \item \textbf{Levenshtein-Distanz} gemäß der klassischen Definition von \citet{levenshtein:binary66} um festzustellen, wie weit eine Ausgabe des Systems vom Goldstandard entfernt liegt. Insbesondere hat eine korrekte Ausgabe des Systems also immer einen Distanz-Wert von $0.0$
 \end{itemize}
-Ebenso wurde zusammen mit den Trainingsdaten ein Baseline-System ausgeliefert, das als Richtwert dient und von dem wir es uns zum Ziel genommen haben, in möglichst vielen verschiedenen Sprachen mit den Accuracy-Werten möglichst weit darüber zu liegen.
+Ebenso wurde zusammen mit den Trainingsdaten ein Baseline-System ausgeliefert, das als Richtwert dient. Wir haben es uns zum Ziel genommen, in möglichst vielen Sprachen mit den Accuracy-Werten möglichst weit über den Ergebnissen dieses Baseline-Systems zu liegen.
 Dieses Baseline-System wird in \autoref{sec:baseline} näher erläutert.
 
 Letzten Endes wurden alle Systeme der Teilnehmer nach ihrer Accuracy miteinander verglichen, und wir haben uns dabei mit unserer Abgabe im soliden Mittelfeld positioniert. Insbesondere haben wir unsere Zielsetzung weitestgehend erreicht, und bis auf vereinzelte Ausreißer (die unter \autoref{sec:results} noch diskutiert werden) die Werte der Baseline überboten.
@@ -120,8 +120,7 @@ Aufgabe 2 wurde von uns nicht bearbeitet. Sie behandelt Flexion im Kontext: In e
 % ?, Fynn
 Die Flexion als solche unterliegt als morphologischer Prozess in vielen Sprachen den grundlegenden Wortbildungsprozessen mit Affixen.
 Wörter in ihrer Grundform können zumeist in Wortstamm sowie Präfixe und Suffixe aufgeteilt werden. Diese einzelnen Bestandteile werden wiederum angepasst.
-Allerdings gibt es auch mehrere Sprachen, die mit Infix und Ablaut anstatt von (oder zusätzlich zu!) Zirkumfixen arbeiten.
-\citep{inflection_seq}
+Allerdings gibt es auch mehrere Sprachen, die mit Infixen und Ablauten anstatt von (oder zusätzlich zu) Zirkumfixen arbeiten \citep{inflection_seq}.
 Letztendlich geschieht der Vorgang also auf Zeichen-Ebene, und auch die menschliche Intuition der Sprache funktioniert als zeichenweises Abändern des als Lemma gegebenen Wortes \citep{pinker:2015:words}; es schien uns daher von Beginn an sinnvoll, diese Funktionsweise Zeichen für Zeichen in unserem System umzusetzen.
 
 \begin{figure}[htb]
@@ -136,11 +135,11 @@ bungas & \texttt{N;INST;PL}\\  \addlinespace
 \end{figure}
 
 \subsection{Systeme aus den Vorjahren}
-Der in \autoref{sec:sub:shared_task} beschriebene Shared Task wurde in einer sehr ähnlichen Form schon in den Vorjahren (2017 und 2016) abgehalten, und nachdem die Veranstalter jedes Jahr dazu aufrufen ein \textit{System Description Paper} zu verfassen standen uns recht viele Vorergebnisse und Überlegungen anderer Teilnehmer zur Verfügung. Wir haben uns nicht nur deswegen Inspiration bei manchen dieser Systeme geholt, um Ideen für unser eigenes Verfahren zu entwickeln.
+Der in \autoref{sec:sub:shared_task} beschriebene Shared Task wurde in einer sehr ähnlichen Form schon in den Vorjahren (2017 und 2016) abgehalten, und nachdem die Veranstalter jedes Jahr dazu aufrufen ein \textit{System Description Paper} zu verfassen standen uns recht viele vergleichbare Vorergebnisse und Überlegungen anderer Teilnehmer zur Verfügung. Wir haben uns nicht nur deswegen Inspiration bei manchen dieser Systeme geholt um Ideen für unser eigenes Verfahren zu entwickeln.
 
 \subsection{Machine Translation}
 Eine weitere maßgebliche Grundidee kam aus dem Bereich der maschinellen Übersetzung. Auch hier sollen -- entweder auf Wort- oder auf Zeichenebene -- Umwandlungsprozesse stattfinden, die konkreten Regeln unterliegen.
-Insbesondere wird bei der Übersetzung von Vokabeln zunehmend auf Character Embeddings gesetzt \citep{charMT1, charMT2, charMT3, charMT4, charMT5}.
+Insbesondere wird bei der Übersetzung von Vokabeln zunehmend auf \textit{Character Embeddings} gesetzt \citep{charMT1, charMT2, charMT3, charMT4, charMT5}.
 \citet{cjk-mt:LiuLLN17} gehen sogar noch einen Schritt weiter und untersuchen Eigenschaften von Zeichen auf Pixel-Ebene, um die Ergebnisse der Übersetzung weiter zu verbessern.
 
 \subsection{Unsere Schlussfolgerungen}
@@ -158,23 +157,23 @@ Der Umformungsprozess eines Eingabe-Lemmas in eine Ausgabeform wird in unserem S
 \begin{itemize}
     \item \action{EMIT} $s$ (für ein beliebiges Symbol $s$): Hängt $s$ an den Ausgabe-String an, unabhängig davon, welches Zeichen der Zeiger gerade liest.
     \item \action{COPY}: Hängt dasjenige Zeichen an die Ausgabe an, auf das der Zeiger im Lemma gerade zeigt.
-    \item \action{PATCH $x$}: Wende die Patch-Operation $x$ auf das Zeichen des Eingabe-Zeigers an, und hänge das resultierende Zeichen an den Ausgabe-String an.
-    \item \action{MOVE}: Inkrementiere den Zeiger um 1 Zeichen, um weiter über das Eingabewort zu laufen.
-    \item \action{EOW} (\underline{e}nd \underline{o}f \underline{w}ord): Den Transformationsprozess abschließen und die aktuelle Ausgabe als finalen Rückgabewert kennzeichnen.
+    \item \action{PATCH $x$}: Wendet die Patch-Operation $x$ auf das Zeichen des Eingabe-Zeigers an, und hängt das resultierende Zeichen an den Ausgabe-String an.
+    \item \action{MOVE}: Inkrementiert den Zeiger um 1 Zeichen, um weiter über das Eingabewort zu laufen.
+    \item \action{EOW} (\underline{e}nd \underline{o}f \underline{w}ord): Schließt den Transformationsprozess ab und kennzeichnet die aktuelle Ausgabe als finalen Rückgabewert.
 \end{itemize}
 
 Besonders hervorzuheben ist hierbei die \action{PATCH}-Aktion, die den zuvor genannten Wandel eines Zeichens im Wortstamm erfassen soll. Die ganze Struktur wird in \autoref{sec:patches} genauer erläutert.
-Außerdem lässt sich auch ohne formalen Beweis schnell erkennen, dass der oben skizzierte Transduktor jeden beliebigen Input auf jede beliebige Ausgabe abbilden kann, indem er nämlich pro Zeichen $o$ im Ausgabewort einfach $o$ emittiert und dann ein \action{EOW} ausgibt. Natürlich ist diese Herangehensweise sehr naiv und nutzt nicht die Tatsache, dass Lemma und flektierte Form oft einen gemeinsamen Wortstamm beinhalten; daher nutzen wir weitere Verfahren um dieses Verhalten zu optimieren.
+Außerdem lässt sich auch ohne formalen Beweis schnell erkennen, dass der oben skizzierte Transduktor jeden beliebigen Input auf jede beliebige Ausgabe abbilden kann, indem er pro Zeichen $o$ im Ausgabewort einfach $o$ emittiert und dann ein \action{EOW} ausgibt. Natürlich ist diese Herangehensweise sehr naiv und nutzt nicht die Tatsache, dass Lemma und flektierte Form oft einen gemeinsamen Wortstamm beinhalten. Daher nutzen wir weitere Verfahren um dieses Verhalten zu optimieren.
 
 \subsection{Alignment}
 \label{sec:alignment}
-Lemma und Vollform werden durch einen Aligner über Füllzeichen so ausgerichtet, dass möglichst viele übereinstimmende Zeichen miteinander aligniert sind. Dadurch ermöglichen wir dem Transduktor möglichst viele \action{COPY}-Aktionen, die später eine erhebliche Vereinfachung bei der Anwendung der Flexionsregeln bedeuten.
+Lemma und Vollform werden durch einen \textit{Aligner} über Füllzeichen so ausgerichtet, dass möglichst viele übereinstimmende Zeichen miteinander aligniert sind. Dadurch ermöglichen wir dem Transduktor möglichst viele \action{COPY}-Aktionen, die später eine erhebliche Vereinfachung bei der Anwendung der Flexionsregeln bedeuten.
 
 Der Aligner selbst beruht auf der einfachen Editierdistanz nach \citet{levenshtein:binary66}. Wir haben lediglich eine weitere Bedingung hinzugefügt, die zwei verschiedene Zeichen $a, b$ auch dann mit Kosten $0$ berechnet, wenn ein Patch $p$ existiert, der $a$ in $b$ überführt. Nach Berechnung dieser Kostenfunktion wählen wir dasjenige Alignment, das die geringste Levenshtein-Distanz (zuzüglich unserer \action{PATCH}-Regel) ergibt.
 
 \subsection{Orakel-Algorithmus}
 \label{sec:orakel-alg}
-Um schlussendlich aus einem Alignment zwischen Lemma und flektierter Form auch eine Aktionskette für den Transduktor errechnen zu können, nutzen wir einen deterministischen Algorithmus der als statisches Orakel agiert. Eine genaue Darstellung der Prozedur findet sich in \autoref{alg:oracle}.
+Um schlussendlich aus einem Alignment zwischen Lemma und flektierter Form auch eine Aktionskette für den Transduktor errechnen zu können, nutzen wir einen deterministischen Algorithmus, der als statisches Orakel agiert. Eine genaue Darstellung der Prozedur findet sich in \autoref{alg:oracle}.
 
 \begin{algorithm}[htb]
 \begin{algorithmic}
@@ -203,13 +202,13 @@ Um schlussendlich aus einem Alignment zwischen Lemma und flektierter Form auch e
 
 \section{Patches}
 \label{sec:patches}
-Ein Kerngedanke unseres Systems sind die sogenannten \textit{Patches}. Diese repräsentieren eine grafische Änderung zwischen zwei ähnlichen Zeichen, und können in unserem Transduktor als Aktionen engesetzt werden.
+Ein Kerngedanke unseres Systems sind die sogenannten \textit{Patches}. Diese repräsentieren eine grafische Änderung zwischen zwei ähnlichen Zeichen, und können in unserem Transduktor als Aktionen eingesetzt werden.
 
-Die Idee zur Verwendung dieser Patches kam uns als deutsche Muttersprachler bei den Buchstaben ä,ö und ü. Das Ziel ist es, den Übergang von \texttt{a} nach \texttt{ä} in einer Operation einzufangen, die man dann im Sinne einer partiellen Funktion $p(x)$ auch auf andere Zeichen anwenden kann. So würde aus $p($\texttt{o}$)$ zum Beispiel analog \texttt{ö}, aber der selbe Patch $p$ lässt sich nicht auf etwa \texttt{t} anwenden.
+Die Idee zur Verwendung dieser Patches kam uns als deutsche Muttersprachler bei den Buchstaben ä, ö und ü. Das Ziel ist es, den Übergang von \texttt{a} nach \texttt{ä} in einer Operation einzufangen, die man dann im Sinne einer partiellen Funktion $p(x)$ auch auf andere Zeichen anwenden kann. So würde aus $p($\texttt{o}$)$ zum Beispiel analog \texttt{ö}, aber der selbe Patch $p$ lässt sich nicht auf etwa \texttt{t} anwenden. \todo{M: Gehört das nicht schon zur Motivation?}
 
 \subsection{Motivation}
-Die zuvor beschriebene Einteilung von Patches erscheint sinnvoll, da viele Wörter im Deutschen den Wortstamm - also eben den Teil des Wortes den unsere Architektur optimalerweise einfach mit \action{COPY}-Wiederholungen übernehmen soll - bei der Flektion verändern (siehe Tabelle X).
-Ein ähnliches Phänomen lässt sich auch in anderen Sprachen beobachten \citep{wiese:umlaut2009, kendris:cedilla2001}, weswegen wir den Entschluss gefasst haben das Konzept der \textit{Patches} fest in unser System zu verbauen. Obgleich wir nicht jede der über 100 bereitgestellten Sprachen beherrschen, steht so zumindest auf jedem Datensatz die Möglichkeit zur Verfügung, Patch-Aktionen durchzuführen. Im schlimmsten Fall, d.h. falls eine Sprache dieses Konzept überhaupt nicht nutzt, würden auch keine Patches gelernt und das System fällt auf einen einfachen Transduktionsprozess mit ausschließlich \action{COPY}, \action{MOVE} und \action{EMIT}-Aktionen zurück.
+Die zuvor beschriebene Einteilung von Patches erscheint sinnvoll, da viele Wörter im Deutschen den Wortstamm - also eben den Teil des Wortes den unsere Architektur optimalerweise einfach mit \action{COPY}-Wiederholungen übernehmen soll - bei der Flexion verändern (siehe Tabelle X).
+Ein ähnliches Phänomen lässt sich auch in anderen Sprachen beobachten \citep{wiese:umlaut2009, kendris:cedilla2001}, weswegen wir den Entschluss gefasst haben das Konzept der \textit{Patches} fest in unser System zu verbauen. Obgleich wir nicht jede der über 100 bereitgestellten Sprachen beherrschen, steht so zumindest auf jedem Datensatz die Möglichkeit zur Verfügung, Patch-Aktionen durchzuführen. Im schlimmsten Fall, d.h. falls eine Sprache dieses Konzept überhaupt nicht nutzt, würden auch keine Patches gelernt und das System fällt auf einen einfachen Transduktionsprozess mit ausschließlich \action{COPY}, \action{MOVE} und \action{EMIT}-Aktionen zurück.\todo[inline]{M: Vielleicht noch erwähnen, dass wir Patches auch dann nicht nutzen, wenn die Sprache es zwar nutzt, aber keine Verbesserung der Ergebnisse stattfindet?}
 
 Eine weitere Inspiration war die zuvor bereits zitierte Arbeit von \citet{cjk-mt:LiuLLN17}, in der für ostasiatische Sprachen mit nicht-lateinischen Alphabeten die Auswirkung von Symbolfragmenten auf Pixelebene auf die Ergebnisse von Machine Translation untersucht wurde.
 Insbesondere der Code, den die Autoren online zur Verfügung gestellt haben, war uns eine große Hilfe für unsere eigene erste Implementation.
@@ -218,22 +217,22 @@ Insbesondere der Code, den die Autoren online zur Verfügung gestellt haben, war
 Die Erzeugung der Patches geschieht grundsätzlich mit Hilfe von gerenderten 2D-Pixelmatrizen der jeweiligen Zeichen. Wir erzeugen für jedes Zeichen eine binäre Matrix konstanter Höhe und Breite, die pro Eintrag Informationen darüber enthält ob ein Pixel schwarz ist oder nicht.
 Die sich daraus ergebenden Matrizen werden dann paarweise mit \texttt{XOR}-Operationen über den einzelnen Elementen verglichen, woraus sich genau diejenigen Pixel ergeben, die zwischen den beiden Eingabematrizen unterschiedlich sind. Insbesondere nutzen wir aber nur diejenigen Ergebnisse, die auf Grundlage desselben ASCII-Zeichens errechnet wurden; ein Patch von \texttt{f} nach \texttt{d} ist zwar technisch möglich, umfasst aber statt einer Gruppe von ähnlichen Anwendungen nur diese eine Symbolsequenz und bringt damit keinen Mehrwert gegenüber einem einfachen \action{EMIT} \texttt{d}.
 
-Eine Besonderheit stellt im lateinischen Alphabet der Buchstabe \texttt{i} dar, da der typische \enquote{i-Punkt} beim Patchen verschwindet und durch Akzentzeichen ersetzt wird. Im Gegensatz dazu wird bei allen anderen 25 Buchstaben des einfachen lateinischen Alphabets das Akzentzeichen \textit{hinzugefügt}, ohne die schon existierenden Pixel zu beeinflussen. Um dieses Verhalten auch für den Buchstaben \texttt{i} korrekt zu fassen, wird er in unserem System vor dem Rendern daher durch das türkische Symbol \texttt{ı} ohne Punkt ersetzt, um ein vergleichbares Ergebnis zu erzeugen. Nichtsdestotrotz könnte dieser Effekt auch in uns unbekannten Sprachen mit nicht-lateinischen Alphabeten auftreten, daher erlaubt es die Architektur problemlos, weitere Ersetzungsregeln einzufügen falls gewünscht.
+Eine Besonderheit stellt im lateinischen Alphabet der Buchstabe \texttt{i} dar, da der typische \enquote{i-Punkt} beim Patchen verschwindet und durch Akzentzeichen ersetzt wird. Im Gegensatz dazu wird bei allen anderen 25 Buchstaben des einfachen lateinischen Alphabets das Akzentzeichen \textit{hinzugefügt}, ohne die schon existierenden Pixel zu beeinflussen. Um dieses Verhalten auch für den Buchstaben \texttt{i} korrekt zu fassen, wird er in unserem System vor dem Rendern daher durch das Symbol \texttt{ı} aus den Turksprachen\todo[inline]{M: das Symbol ist nicht nur türkisch, sondern aus den Turksprachen: \url{https://de.wikipedia.org/wiki/\%C4\%B0}} ohne Punkt ersetzt, um ein vergleichbares Ergebnis zu erzeugen. Nichtsdestotrotz könnte dieser Effekt auch in uns unbekannten Sprachen mit nicht-lateinischen Alphabeten auftreten, daher erlaubt es die Architektur problemlos weitere Ersetzungsregeln einzufügen falls gewünscht.
 
 \subsection{Zerlegung nach NFD-Standard}
 \label{sec:nfd}
 Das Unicode-Konsortium pflegt einen Katalog an Normalisierungsformen\footnote{siehe \url{http://unicode.org/reports/tr15/}}, die Abbildungen zwischen Zeichen und deren Bestandteilen realisieren. Viele gängige Modifikationen, die von unserer Patch-Komponente errechnet werden, sind auch als Symbolmodifikatoren im Unicode-Standard vertreten. Diese sind als Einzelzeichen (im Regelfall) nicht sichtbar, sondern werden erst mit einem weiteren Eingabebuchstaben gemeinsam in einem Multibyte-Zeichen dargestellt.
 
-Insbesondere verhält sich der \texttt{NFD}-Standard dabei sehr ähnlich zu unseren Patches. Er zerlegt ein Symbol in eine Kette aus allen möglichst atomaren Symbolbestandteilen, wie etwa \texttt{â} in das ASCII-Zeichen \texttt{a} und den Modifikator \texttt{U+0302}\footnote{Dieses Zeichen ist alleine nicht darstellbar/sichtbar, daher wurde hier bewusst der Codepunkt in der Unicode-Ebene angegeben}.
-Trotz dieser starken Ähnlichkeiten nutzt unser System den NFD-Standard nicht. Uns war beim Entwurf und während der Implementierung nicht klar, dass ein solch detaillierter und gut strukturierter Standard existiert. In Eigenregie ein vergleichbares Feature zu realisieren hätte den hohen Arbeitsaufwand gegenüber dem grafischen Matrix-System nicht gerechtfertigt. Trotzdem ist es denkbar, die beiden Komponenten zu vereinigen und Ergebnisse aus beiden Teilen zu kombinieren, um gemeinsam eine noch bessere Patch-Erkennung zu ermöglichen. Dabei muss aber berücksichtigt werden, dass der NFD-Standard an gewissen Stellen möglicherweise unserem Patch-Konzept widerspricht, und es scheint nicht plausiblel vorher alle Eingabezeichen in jedwedem Eingabealphabet manuell zu überprüfen.
+Insbesondere verhält sich der \texttt{NFD}-Standard dabei sehr ähnlich zu unseren Patches. Er zerlegt ein Symbol in eine Kette aus allen möglichst atomaren Symbolbestandteilen, wie etwa \texttt{â} in das ASCII-Zeichen \texttt{a} und den Modifikator \texttt{U+0302}\footnote{Dieses Zeichen ist alleine nicht darstellbar/sichtbar, daher wurde hier bewusst der Codepunkt in der Unicode-Ebene angegeben.}.
+Trotz dieser starken Ähnlichkeiten nutzt unser System den NFD-Standard nicht. Uns war beim Entwurf und während der Implementierung nicht klar, dass ein solch detaillierter und gut strukturierter Standard existiert. In Eigenregie ein vergleichbares Feature zu realisieren hätte den hohen Arbeitsaufwand gegenüber dem grafischen Matrix-System nicht gerechtfertigt. Trotzdem ist es denkbar, die beiden Komponenten zu vereinigen und Ergebnisse aus beiden Teilen zu kombinieren, um gemeinsam eine noch bessere Patch-Erkennung zu ermöglichen. Dabei muss aber berücksichtigt werden, dass der NFD-Standard an gewissen Stellen möglicherweise unserem Patch-Konzept widerspricht, und es scheint nicht plausibel vorher alle Eingabezeichen in jedwedem Eingabealphabet manuell zu überprüfen.
 
 \subsection{Wahl der Schriftart und Rendering}
 Bei der Darstellung der Eingabezeichen kommt es hauptsächlich auf zwei Kriterien an, die im folgenden erläutert werden.
 
-Erstens muss jedes Zeichen bei gleicher Schriftgröße in genau gleicher Breite und Höhe gerendert werden, wobei Basiszeichen wie \texttt{e} und gepatchte Zeichen wie \texttt{è} an der selben Stelle innerhalb des Rasters dargestellt werden müssen.
-Glücklicherweise wird genau diese Eigenschaft per Definition von den sogenannten \textit{Monospace}-Schriftarten gewährleistet. Wir haben also 14 verschiedene solcher Schriftarten getestet, und nur bei zwei davon gab es Probleme mit der perfekt akkuraten Darstellung und Positionierung aller Grundzeichen. Die restlichen 12 Schriftarten wurden als \enquote{geeignet} befunden.
+Erstens muss jedes Zeichen bei gleicher Schriftgröße in genau gleicher Breite und Höhe gerendert werden, wobei Basiszeichen wie \texttt{e} und \textit{gepatchte} Zeichen wie \texttt{è} an derselben Stelle innerhalb des Rasters dargestellt werden müssen.
+Glücklicherweise wird genau diese Eigenschaft per Definition von den sogenannten \textit{Monospace}-Schriftarten gewährleistet. Wir haben also 14 verschiedene solcher Schriftarten getestet, und nur bei zwei davon gab es Probleme mit der perfekt akkuraten Darstellung und Positionierung aller Grundzeichen\todo[inline]{M: ein paar Beispiel-Fonts nennen?}. Die restlichen 12 Schriftarten wurden als \enquote{geeignet} befunden.
 
-Zweitens soll eine möglichst hohe Unicode-Abdeckung erreicht werden, damit nicht jedes Zeichen als \enquote{Unbekannt-Rechteck} dargestellt wird, denn daraus könnten im Folgenden keine Patches errechnet werden. Unsere Tests mit den 12 gewählten Schriften haben gezeigt, dass keine davon jedes Zeichen das in den Trainings-Sets auftaucht darstellen kann, und wir haben uns letztendlich auf denjenigen Schriftsatz mit der Prozentual höchsten Abdeckung festgelegt.
+Zweitens soll eine möglichst hohe Unicode-Abdeckung erreicht werden, damit nicht jedes Zeichen als \enquote{Unbekannt-Rechteck} dargestellt wird, denn daraus könnten im Folgenden keine Patches errechnet werden. Unsere Tests mit den 12 gewählten Schriften haben gezeigt, dass keins davon jedes Zeichen, das in den Trainings-Sets auftaucht, darstellen kann, und wir haben uns letztendlich auf denjenigen Schriftsatz \todo{M: welchen?}mit der prozentual höchsten Abdeckung festgelegt.
 
 Das Rendering der Zeichen selbst geschieht über die \textit{pygame}-Bibliothek. Diese ist ursprünglich dafür gedacht, Texte für 2D-Videospiele auf einem Bildschirm darzustellen, eignet sich aber ebenso für die Berechnung unserer Pixelmatrizen. Tatsächlich haben wir in einer ersten Version des Programms Zeichen mit der viel mächtigeren \textit{Python Imaging Library} (kurz \textit{PIL}) gerendert, sind dabei aber auf einige überraschende Probleme gestoßen. Zum einen trimmt diese Bibliothek die Ausgabedaten auf unterschiedlich große Formate, und zum anderen sind komplexe Features wie etwa Anti-Aliasing nicht zuträglich für unser Konzept. Ein \texttt{a} mit Kantenglättung sieht geringfügig anders aus als das \texttt{ä} mit den selben Einstellungen, und es kommt somit viel unnötiges und ungewolltes Rauschen im Patch durch.
 
@@ -251,13 +250,13 @@ Auf diese Weise fassen wir alle möglichen Ausprägungen eines Patches, und das 
 Als eines der großen Schwierigkeiten der Aufgabe haben wir die geringe Menge der Trainingsdaten, insbesondere in den Gruppen \textit{low} und \textit{medium}, angesehen. Daher haben wir uns entschieden, die Möglichkeiten des Erweiterns von Trainingsdaten auszuloten.
 
 \subsection{Motivation}
-Die Idee ist grundsätzlich, Muster wie Suffix- und Präfix-Änderungen ähnlich zur Baseline (siehe dazu auch \autoref{sec:baseline}) zu erkennen und zu replizieren, sodass das System diese Regelmäßigkeiten besser lernen kann. Obgleich bedeutet dies dass seltene, unregelmäßige Veränderungen relativ gesehen weniger häufig in den erweiterten Trainingsdaten vorkommen.
+Die Idee ist grundsätzlich, Muster wie Suffix- und Präfix-Änderungen ähnlich zur Baseline (siehe dazu auch \autoref{sec:baseline}) zu erkennen und zu replizieren, sodass das System diese Regelmäßigkeiten besser lernen kann. Obgleich bedeutet dies, dass seltene, unregelmäßige Veränderungen relativ gesehen weniger häufig in den erweiterten Trainingsdaten vorkommen.
 Eine Vorgabe des Shared Tasks war es außerdem, keine externen Quellen zu verwenden. Folglich haben wir uns darauf beschränkt zusätzliche Daten aus den vorhandenen Daten zu halluzinieren.
 
 Einreichungen zu ähnlichen Shared Tasks der Vorjahre haben bereits Trainingsdaten erweitert, darunter auch die Sieger-Einreichung von 2016 \cite{kann-schutze:2016:SIGMORPHON}. Die Einreichung von \citet{bergmanis:augmenting} nutzte zwei Formen eines Sequence Encoders -- eine nutzte Lemmata und Zielformen als Inputs, die andere zufällige Zeichenketten. Die zusätzlichen Trainingsdaten konnten das Ergebnis in beiden Fällen insgesamt verbessern. \citet{kann-schutze:2017:K17-20} verwendet mehrere Systeme, darunter ein regelbasiertes System. Das System von \citet{silfverberg-EtAl:2017:K17-20} spaltet die Wörter in Präfix, Stamm und Suffix und generiert neue Wörter mit diesen Affixen. Weitere Ansätze zur Erweiterung von Trainingsdaten zeigen \cite{zhou-neubig:2017:K17-20} und \cite{nicolai-EtAl:2017:K17-20}.
 
 \subsection{Grundlegender Erweiterungsprozess}
-Um künstliche Daten für einen Datensatz zu generieren, sortiert unser System die Eingabe-Daten in Gruppen von Flexionen mit denselben Features. Innerhalb jeder Gruppe aligniert und vergleicht es jedes Paar von Lemma und Flexion mit jedem anderen Paar und behält pro Vergleich nur die übereinstimmenden Zeichen an den alignierten Positionen. Das Alignieren erfolgt wie in \autoref{sec:alignment} beschrieben. Die restlichen Zeichen werden gelöscht und nach einem N-Gramm-Sprachmodell, das aus dem Datensatz generiert wird, aufgefüllt. Dabei werden die gleichen Zeichen, die im Lemma eingesetzt wurden, auch in der Flexion eingesetzt. Bleiben noch Lücken übrig, werden sie durch weitere Zeichen aus dem Modell aufgefüllt. Das Sprachmodell wird in \autoref{sec:enhancer-example} an einem Beispiel erläutert.
+Um künstliche Daten für einen Datensatz zu generieren sortiert unser System die Eingabe-Daten in Gruppen von Flexionen mit denselben Features. Innerhalb jeder Gruppe aligniert und vergleicht es jedes Paar von Lemma und Flexion mit jedem anderen Paar und behält pro Vergleich nur die übereinstimmenden Zeichen an den alignierten Positionen. Das Alignieren erfolgt wie in \autoref{sec:alignment} beschrieben. Die restlichen Zeichen werden gelöscht und nach einem N-Gramm-Sprachmodell, das aus dem Datensatz generiert wird, aufgefüllt. Dabei werden die gleichen Zeichen, die im Lemma eingesetzt wurden, auch in der Flexion eingesetzt. Bleiben noch Lücken übrig, werden sie durch weitere Zeichen aus dem Modell aufgefüllt. Das Sprachmodell wird in \autoref{sec:enhancer-example} an einem Beispiel erläutert.
 
 Das System produziert eine vorgegebene Anzahl an künstlichen Wörtern pro Paar. In unseren Versuchen haben wir herausgefunden, dass mehr als fünf Wörter pro Paar keine Verbesserung für das Endergebnis bringt. Bei den meisten Sprachen hat ein einzelnes zusätzliches Wort das beste Ergebnis gebracht. Wir haben darüber hinaus eine Bedingung eingebaut, die eine minimale Anzahl an Vorkommnisse des Musters der Übereinstimmung vorgibt, konnten jedoch keine Verbesserung des Ergebnisses durch Vorgabe dieses minimalen Supports feststellen.
 
@@ -279,7 +278,7 @@ $\Downarrow$ & $\Downarrow$\\
 \texttt{iomm\textbf{ad}} & \texttt{iommp\textbf{ade}}\\
 \bottomrule
 \end{tabular}
-\caption{Ein Beispiel für die Erstellung eines künstlichen Wortes aus \textit{skapad} -- \textit{skapade} (ADJ;DEF), \lang{Schwedisch}, ''erschaffen''}
+\caption{Ein Beispiel für die Erstellung eines künstlichen Wortes aus \lang{swedish}, (ADJ;DEF): \textit{skapad} -- \textit{skapade}, ''erschaffen'' und \textit{fixad} -- \textit{fixade}, ''festgemacht''}
 \label{fig:example-enhancer}
 \end{table}
 
@@ -314,13 +313,13 @@ Das System, welches wir für den Shared Task entwickelt haben verwendet ein neur
 \label{sec:baseline}
 Das Baseline-System beruht auf Mustererkennung im Prefix bzw. Suffix von Lemma und Flexion. Das System ist dabei stark von Vorgehensweisen von \citet{baseline:Ling2016} inspiriert.
 
-Zuerst werden alle Trainingsdaten analysiert, wobei für jedes Paar von aligniertem Lemma und Flexion die Wörter in Präfix, Stamm und Suffix getrennt werden. Aus diesen werden anschließend feature-spezifische Präfix- und Suffix-Regeln extrahiert. Eine solche Regel bildet das Lemma oder ein Teil des Lemmas auf die korrekte flektierte Form ab.
+Zuerst werden alle Trainingsdaten analysiert, wobei für jedes Paar von aligniertem Lemma und Flexion die Wörter in Präfix, Stamm und Suffix getrennt werden. Aus diesen werden anschließend Feature-spezifische Präfix- und Suffix-Regeln extrahiert. Eine solche Regel bildet das Lemma oder ein Teil des Lemmas auf die korrekte flektierte Form ab.
 
 Unbekannte Kombinationen aus Lemma und Feature verarbeitet das System, indem die längste passende Regel angewandt wird, da dies die genauesten Ergebnisse liefert. Gleichzeitig erfasst dieser Ansatz auch seltene Formen, da sich immer eine der Regeln anwenden lässt, auch wenn diese dann zwangsweise kürzer und eventuell nicht vollkommen korrekt sind.
 
 Die Baseline erreicht bereits mit wenigen Trainingsdaten in den meisten Sprachen eine hohe Accuracy. Insbesondere auf dem kleinsten Trainingsset schlägt sie viele der Systeme, die auf neuronalen Netzen basieren.
 
-Ferner ist das Baseline-System hinsichtlich der Laufzeitperformanz fast sämtlichen anderen Systemen deutlich überlegen. Die Vorhersage samt Analyse- bzw. Trainingsphase nimmt für alle 103 Sprachen über die 3 Trainingsdatenmengen nur wenige Minuten in Anspruch. Das Training eines neuronalen Netzwerks für eine einzelne Sprache benötigt dagegen in den meisten Systemen mehr Zeit.
+Ferner ist das Baseline-System hinsichtlich der Laufzeitperformanz fast sämtlichen anderen Systemen deutlich überlegen. Die Vorhersage samt Analyse- bzw. Trainingsphase nimmt für alle 103 Sprachen über die 3 Trainingsdatenmengen nur wenige Minuten in Anspruch. Schon das Training eines neuronalen Netzwerks allein für eine einzelne Sprache benötigt dagegen in den meisten Systemen mehr Zeit.
 
 Weitere Details zur Umsetzung der Baseline finden sich in der Beschreibung des Shared Tasks aus dem letzten Jahr \citep{sigmorphon:st2017}.
 
@@ -334,7 +333,7 @@ Weitere Details zur Umsetzung der Baseline finden sich in der Beschreibung des S
 \end{figure}
 Die eingesetzte Architektur unseres neuronalen Netzwerkes ist für jede der 103 Sprachen und über die 3 Trainingsdatenmengen hinweg identisch.
 Die Architektur des Systems ist in \autoref{fig:arch} dargestellt. Das neuronale Netzwerk agiert dabei als Orakel für den String-Transduktor aus \autoref{sec:transducer}.
-Eingaben des gesamten Systems sind das Lemma eines Wortes sowie die Features der gewünschten Flektionsform.
+Eingaben des gesamten Systems sind das Lemma eines Wortes sowie die Features der gewünschten Flexionsform.
 In Abhängigkeit von Lemma, Features, aktueller Position des Zeigers und vorheriger Ausgabe gibt das Netzwerk je eine Aktion (\action{COPY}, \action{PATCH} $p$, \action{MOVE}, \action{EMIT} $s$ oder \action{EOW}) aus, die der String-Transduktor anwendet.
 Das Vorhersagen und Anwenden einer Aktion findet für jedes Eingabewort solange statt, bis \action{EOW} durch das neuronale Netzwerk ausgegeben wird. Abschließend finalisiert der String-Transduktor die Flexion des Wortes und gibt sie aus.
 
