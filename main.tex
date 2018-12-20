@@ -242,7 +242,8 @@ Nach vollständigem Rendering werden die Ergebnismatrizen je nach Ähnlichkeit i
 
 Weiterhin kann die ursprüngliche Pixelmatrix, die zur Berechnung des Patches herangezogen wurde, verworfen werden, sobald alle Gruppen gebildet sind. Das endgültige Ergebnis ist dann eine Lookup-Tabelle, in der jeder Patch nur noch als Zahl repräsentiert wird. Ab diesem Zeitpunkt ist nur noch die Eingabe $c$ sowie die Ausgabe $p(c)$ relevant. Die eigentliche, grafische Veränderung ist in der fertigen Tabelle nicht mehr von Belang.
 
-Wir gehen mit ungesehenen Zeichen im Evaluations-Datensatz um, indem wir die Patch-Tabelle über einer größeren Zeichenmenge generieren als das Eingabealphabet der Trainingsdaten eigentlich vorschreibt. Die Schriftart wird zu Beginn der Trainingsphase einmal genutzt, um einen Großteil der Unicode-Ebene als Pixelmatrizen in einen großen Pool zu rendern. Sobald dann einmal für eine gewisse Menge an Zeichen eine Patch-Tabelle erzeugt werden soll, werden alle relevanten Teile der im Pool vorgehaltenen Unicode-Symbole abgeglichen. Ein Patch $p$ ist dabei relevant, wenn er unter den Eingabezeichen mindestens einmal erkannt wird -- alle anderen Instanzen des Patches mit anderen modifizierten Zeichen als Grundlage werden aber ebenso in die jeweils resultierende Patch-Tabelle mit aufgenommen. Nur auf diese Weise erfassen wir alle möglichen Ausprägungen eines Patches die unsere Grundannahmen über Unicode zulassen.
+Wir gehen mit ungesehenen Zeichen im Evaluations-Datensatz um, indem wir die Patch-Tabelle über einer größeren Zeichenmenge generieren als das Eingabealphabet der Trainingsdaten eigentlich vorschreibt. Die Schriftart wird zu Beginn der Trainingsphase einmal genutzt, um einen Großteil der Unicode-Ebene als Pixelmatrizen in einen großen Pool zu rendern. Sobald dann einmal für eine gewisse Menge an Zeichen eine Patch-Tabelle erzeugt werden soll, werden alle relevanten Teile der im Pool vorgehaltenen Unicode-Symbole abgeglichen. Ein Patch $p$ ist dabei relevant, wenn er unter den Eingabezeichen mindestens einmal erkannt wird -- alle anderen Instanzen des Patches mit anderen modifizierten Zeichen als Grundlage werden aber ebenso in die jeweils resultierende Patch-Tabelle mit aufgenommen.
+%Nur auf diese Weise erfassen wir alle möglichen Ausprägungen eines Patches die unsere Grundannahmen über Unicode zulassen.
 
 \section{Erweitern der Trainingsdaten}
 \label{sec:enhancer}
@@ -357,7 +358,7 @@ Der Encoder verarbeitet das komplette Eingabe-Lemma als indexbasierten Tensor au
 Durch Verwendung einer externen Schleife produziert der Decoder eine einzelne Transduktor-Aktion pro Schleifendurchlauf.
 In jedem Schritt erhält der Decoder als Eingabe seinen vorherigen internen Zustand, die zuletzt ausgegebene Aktion, die Features der Zielform und den zurzeit betrachteten Teil der Encoder-Ausgabe. Auf welchen Teil der Encoder-Ausgabe Zugriff gewährt wird, bestimmt dabei der Index-Zeiger im Transduktor.
 Immer, wenn der Decoder eine \action{MOVE} Aktion ausgibt, wird der Index-Zeiger um $1$ erhöht, sodass der Decoder im folgenden Schleifendurchlauf auf die Encoder-Ausgabe für das nächste Lemma-Zeichen zugreift.
-Falls Aktionen den Index-Zeiger über die Länge des Lemmas hinaus schieben würden, werde diese stattdessen ignoriert.
+Falls Aktionen den Index-Zeiger über die Länge des Lemmas hinaus schieben würden, werden diese stattdessen ignoriert.
 
 \subsection{Beam Search}
 % Fynn
@@ -435,7 +436,7 @@ Das implementierte Beam-Decoding erlaubt theoretisch eine globale Normalisierung
 Leider konvergiert das Training des Modells mit globaler Normalisierung und Beam Search in unseren Versuchen nicht.
 \citet{globalnorm:AndorAWSPGPC16} haben vortrainierte Gewichte mittels lokaler Normalisierung verwendet, um dieses Problem zu umgehen.
 Da wir allerdings keine robuste Möglichkeit zum Wechseln von lokaler zu globaler Normalisierung für alle 103 Sprachen finden konnten, setzen wir ausschließlich lokale Normalisierung im Training ein.
-Sobald der korrekte Pfad während des Dekodierens aus dem Beam fällt, wird ein Trainingsupdate mit unserer spezifischen \textit{Loss}-Funktion auf Grundlage der logarithmischen Wahrscheinlichkeiten der einzelnen Schritte im korrekten Pfad durchgeführt.
+Sobald der korrekte Pfad während des Dekodierens aus dem Beam fällt, wird ein Trainingsupdate mit unserer spezifischen \textit{Loss}-Funktion auf Grundlage der logarithmischen Wahrscheinlichkeiten der Schritte im korrekten Pfad durchgeführt.
 
 Die \textit{Loss}-Funktion in \autoref{eq:loss} basiert auf der lokal normalisierten Pfadwahrscheinlichkeit, die als Gleichung (4) in \citet{globalnorm:AndorAWSPGPC16} dargestellt ist.
 Sie berechnet die negative Summe über die logarithmischen Wahrscheinlichkeiten $l$ der korrekten Aktionen für jeden Schritt des Pfades.
@@ -481,7 +482,7 @@ Aufgrund der relativ komplexen Implementierung des Beam-Decoding haben wir bis z
 Um die Ergebnisse unseres Systems zu verbessern, haben wir eine ausgedehnte Hyperparameter-Suche vorgenommen.
 Der zuvor geschilderte Aufbau des Systems ist dabei für alle Sprachen identisch.
 Je Sprache und Größe des Trainingsdatensatzes haben wir eine unabhängige Hyperparameter-Suche auf einer zufälligen Auswahl aus dem Such-Raster der Parameter durchgeführt.
-\autoref{tab:params} listet die Hyperparameter mitsamt ihrer möglichen Werte auf.
+\autoref{tab:params} listet die Hyperparameter mit möglichen Werten auf.
 
 Während der Entwicklungsphase des Systems ist uns aufgefallen, dass die zufällige Initialisierung der Netzwerkgewichte großen Einfluss auf die Ergebnisse hat. Es handelt sich dabei um ein typisches Problem, welches insbesondere dann auftritt, wenn nur wenige Trainingsdaten zur Verfügung stehen.
 Aus diesem Grund wird in unserer Hyperparamter-Suche jede Parameterkombination mit fünf verschiedenen Zufalls-Seeds durchlaufen, wodurch sowohl die Netzwerkgewichte andere Startwerte annehmen als auch die Reihenfolge der einzelnen Trainingsdatenpunkte variiert.
@@ -493,7 +494,7 @@ Dies dauert in etwa ein bis drei Minuten für den kleinsten, zehn bis 20 Minuten
 Da eine erschöpfende Suche von $55.620$ Parameterkombinationen zu viel Rechenzeit in Anspruch nähme, haben wir Möglichkeiten erkundet um den Suchaufwand zu reduzieren. Für den mittleren Trainingsdatensatz werden nur GRU- und Embedding-Größen getestet, die größer oder gleich dem besten Ergebnis auf dem kleinen Trainingsdatensatz sind.
 Analog dazu ist der große Datensatz ebenfalls in diesen beiden Parametern durch die besten Ergebnisse des mittleren Datensatzes beschränkt.
 Dies ist naheliegend, da mit steigender Anzahl von Gewichten im neuronalen Netzwerk mehr Trainingsdaten benötigt werden, damit kein \textit{Overfitting} eintritt.
-Zusätzlich verwenden wir den Enhancer ausschließlich auf dem kleinen Trainingsdatensatz, da bereits das mittlere Set genügend Traningsbeispiele enthält.
+Zusätzlich verwenden wir den Enhancer ausschließlich auf dem kleinen Trainingsdatensatz, da bereits das mittlere Set genügend Trainingsbeispiele enthält.
 Aus diesen reduzierten Parameterkombinationen wird je Sprache und Größe der Trainingsdaten eine zufällige Auswahl gezogen, um eine feste obere Grenze an Trainingsdurchläufen zu garantieren.
 Für die Abgabe der Ergebnisse für den Shared Task hat unsere Hyperparameter-Suche $9.278$ Trainingsläufe durchgeführt, was einer Reduktion auf beinahe ein Sechstel der ursprünglichen Menge entspricht.
 
@@ -703,7 +704,7 @@ Während bei einigen Sprachen sogar ein noch stärkerer Anstieg der Accuracy auf
 
 Über alle Sprachen gemittelt führt der Einsatz von Beam-Decoding mit Größe 16 zu einer Erhöhung der Accuracy von $4\%$.
 Ein Binomialtest zur Prüfung, ob es sich ausschließlich um zufällige Erhöhungen handelt, weist im Ergebnis eine Wahrscheinlichkeit von nur $2.4 \times 10^{-10}$ auf.
-Daher führt Beam-Decoding zu einem merklichen Anstieg der Accuracy, was auch mit der Intuition übereinstimmt, dass Beam-Decoding nur bessere oder zumindest gleichstarke Ergebnisse im Vergleich zu \textit{greedy decoding} liefert.
+Daher führt Beam-Decoding zu einem merklichen Anstieg der Accuracy, was auch mit der Intuition übereinstimmt, dass Beam-Decoding bessere oder zumindest gleichstarke Ergebnisse im Vergleich zu \textit{greedy decoding} liefert.
 
 \subsection{Schwachstellen}
 \label{sec:schwachstellen}
@@ -738,7 +739,7 @@ So fällt es unserem System äußerst schwer, Präfixe in Suffixe umzuwandeln un
 \end{compactitem}
 Das System ist nicht in der Lage, den Präfix \texttt{ab} des Lemmas am Ende der Flexion anzufügen.
 Dies ist ein zu erwartendes Verhalten, da unser System die Repräsentationen der Buchstaben monoton nacheinander bearbeitet. Dies geschieht ganz ohne die Möglichkeit frei auf die verschiedenen Stellen des Lemmas zurückzugreifen.
-Das neuronale Netzwerk müsste daher die Information des zu Beginn gelesenen Präfixes eines Lemmas so lange im internen Zustand speichern bis dieses am Ende der Flexion wieder auftaucht, da es dem Decoder sonst nicht gestattet ist erneut auf den Anfang des Lemmas zuzugreifen nachdem das Lemma bereits vollständig durchlaufen wurde.
+Das neuronale Netzwerk müsste daher die Information des zu Beginn gelesenen Präfixes eines Lemmas so lange im internen Zustand speichern bis dieses am Ende der Flexion wieder auftaucht, da es dem Decoder sonst nicht gestattet ist erneut auf den Anfang des Lemmas zuzugreifen, nachdem das Lemma bereits vollständig durchlaufen wurde.
 
 Um jenes Problem zu lösen, müsste der Decoder mittels \textit{soft-attention} freien Zugriff auf die gesamte Ausgabe des Encoders erhalten. Dadurch wäre jedoch eine erfolgreiche Anwendung der \action{COPY} und \action{PATCH} Aktionen auf dem Lemma nicht mehr gegeben, was zugleich den Kern unseres Systems ausmacht.
 
@@ -790,7 +791,7 @@ Nach dem Erfolg mit unserem Paper zum Workshop angenommen zu werden, stand die F
 
 Nach etwas anfänglicher Skepsis haben wir den Schritt tatsächlich gewagt, und der Arbeitsbereich \texttt{NATS} hat sich dankenswerterweise sogar dazu bereit erklärt, uns finanziell zu unterstützen und die Reisekosten zu erstatten. Mit einem selbst erstellten Poster\footnote{Zum Zeitpunkt der Erstellung dieses Berichts hängt das Poster aktuell in Raum F-432} im Gepäck, welches die Inhalte des Papers erneut zusammenfasst und illustiert, ging es dann am 31. Oktober nach Brüssel. Eine verkleinerte Abbildung findet sich im Anhang als \autoref{app:poster}.
 
-Dort stand die Teilnahme am Workshop jedem interessierten Zuhörer frei, und es kam zu vielen lehrreichen Diskussionen mit den anderen Teilnehmern. Darüber hinaus waren sogar einige der Organisatoren des Shared Task anwesend, um die Auswertung zu präsentieren. Diese Erfahrungen haben die Projekt-Arbeitsphase fantastisch abgerundet, und dafür gesorgt dass wir jetzt auch in den \textit{Proceedings} der Konferenz zu finden sind.
+Die Teilnahme am Workshop stand interessierten Zuhörern frei und es kam zu vielen lehrreichen Diskussionen mit anderen Teilnehmern. Ferner waren einige der Organisatoren des Shared Task anwesend, um die Auswertung zu präsentieren. Diese Erfahrungen haben die Projekt-Arbeitsphase fantastisch abgerundet und dafür gesorgt, dass wir jetzt auch in den \textit{Proceedings} der Konferenz zu finden sind.
 
 \section{Hindernisse und was wir daraus gelernt haben}
 \label{sec:takeaway}
@@ -805,9 +806,9 @@ Eine weitere wichtige Erfahrung ist, wie wichtig Zeitpuffer und Alternativpläne
 
 \subsection{Fynn}
 Automatisierung ist Trumpf.
-Um Verbesserungen schnell evaluieren zu können, ist es essenziell die Ergebnisse für alle Trainingsdaten verteilt über mehrere Rechner automatisiert berechnen zu lassen.
+Um Verbesserungen schnell evaluieren zu können, ist es essenziell die Ergebnisse aller Trainingsdaten verteilt über mehrere Rechner automatisiert berechnen zu lassen.
 Das umfasst das Verteilen der Arbeitspakete, einsammeln der Ausgaben, deren Evaluation und die grafische Aufbereitung, um Effekte klar erkennen zu können.
-In diesem Rahmen habe ich meine Shell-Scripting-Fähigkeiten enorm ausgebaut, insbesondere im Hinblick auf die zuverlässige Verteilung über mehrere Rechner.
+In diesem Rahmen habe ich meine Shell-Scripting-Fähigkeiten ausgebaut, insbesondere für die zuverlässige Verteilung über mehrere Rechner.
 
 Retrospektiv hatten wir im Team abweichende Erwartungen wie viel wir machen wollen bzw. wie viel Zeit man dafür investiert.
 Das hätten wir schon gegebenenfalls während der Gruppenfindung oder zum Start der Bearbeitung des Shared Tasks herausarbeiten sollen.
@@ -815,9 +816,9 @@ Dabei half es wenig, dass sich die zeitgleiche, gemeinsame Zusammenarbeit als sc
 Es ließen sich keine passenden Zeiten finden, da wir alle nebenbei gearbeitet haben und zusätzlich unterschiedliche Kurse besucht haben.
 Daraus resultierte eine relativ strikte Trennung bei der Aufgabenverteilung und reduzierter Wissensaustausch, auch wenn wir versucht haben, die Stunden am Donnerstag vorrangig dafür zu verwenden, den anderen Gruppenmitgliedern das eigene Werk der letzten Woche zu erklären.
 
-Während der Entwicklung unseres Systems habe ich ein tiefgehendes Verständnis neuronaler Netze erlangt, wie es keine Vorlesung geschafft hat -- insbesondere die Verarbeitung dynamischer Sequenzen, Einbau von nicht-Standard Komponenten wie des Transduktors sowie das Einbringen und Ummünzen anderer Ideen (globale Normalisierung $\to$ eigene Loss-Funktion, Beam-Decoding etc.) auf das eigene neuronales Netz waren klasse Erfahrungen.
-Es hat mir dabei viel Spaß gemacht, das Netzwerk zu verbessern, um noch ein paar Prozentpunkte mehr herauszuholen.
-Das erlangte Verständnis hat mir seitdem schon öfter geholfen neue Paper zu verstehen und wird mir auch Zukunft behilflich sein.
+Während der Entwicklung unseres Systems habe ich ein tiefgehendes Verständnis neuronaler Netze erlangt, wie es keine Vorlesung geschafft hat -- insbesondere die Verarbeitung dynamischer Sequenzen, Einbau von nicht-Standard Komponenten wie des Transduktors sowie das Einbringen und Ummünzen anderer Ideen (globale Normalisierung, eigene Loss-Funktion, Beam-Decoding etc.) auf das eigene neuronales Netz waren klasse Erfahrungen.
+Es hat mir Spaß gemacht, das Netzwerk zu verbessern, um noch mehr Prozentpunkte herauszuholen.
+Das erlangte Verständnis hat mir seitdem geholfen neue Paper zu verstehen und wird mir auch Zukunft behilflich sein.
 
 % Auch wenn Python mit PyTorch schnelle Entwicklung und gutes Debugging bietet, wäre für mich eine typisierte und kompilierte Sprache ab einem gewissen Umfang deutlich von Vorteil gewesen -- die optionale Typisierung und Kompilierung bringt bei den eingesetzten Bibliotheken nur wenig.
 
