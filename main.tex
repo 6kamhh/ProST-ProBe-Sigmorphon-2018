@@ -58,13 +58,13 @@ Fynn Schröder\\
 \pagenumbering{arabic}
 
 \begin{abstract}
-Im diesjährigen\todo{M: ist ''diesjährig'' angemessen?} Projekt \textit{Sprachtechnologie} haben wir den \prostst~mit dem Title \enquote{Universal Morphological Reinflection} bearbeitet. Unser Arbeitsergebnis ist ein neuronales Netzwerk in Anlehnung an \citet{cluzh:MakarovRC17}, das wir um mehrere Kernfunktionen ergänzt haben. Hervorzuheben ist dabei die Einbindung von grafischen Features noch unterhalb der Zeichen-Ebene, die wir in mehreren Konfigurationen auswerten und sprachübergreifend vergleichen. Als Erkenntnis kristallisiert sich dabei heraus, dass diese Zusatzinformationen auf einigen Sprachen helfen können, auf anderen jedoch keinen Mehrwert liefern. Eine weitere Verbesserung der Ergebnisse erzielen wir überdies durch den Einsatz von \textit{Beam-Decoding} und der künstlichen Erweiterung des Trainingsdatensatzes.
+Im Projekt \textit{Sprachtechnologie} haben wir den \prostst~mit dem Title \enquote{Universal Morphological Reinflection} bearbeitet. Unser Arbeitsergebnis ist ein neuronales Netzwerk in Anlehnung an \citet{cluzh:MakarovRC17}, das wir um mehrere Kernfunktionen ergänzt haben. Hervorzuheben ist dabei die Einbindung von grafischen Features noch unterhalb der Zeichen-Ebene, die wir in mehreren Konfigurationen auswerten und sprachübergreifend vergleichen. Als Erkenntnis kristallisiert sich heraus, dass diese Zusatzinformationen auf einigen Sprachen helfen, auf anderen jedoch keinen Mehrwert liefern. Eine weitere Verbesserung der Ergebnisse erzielen wir überdies durch den Einsatz von \textit{Beam-Decoding} und der künstlichen Erweiterung der Trainingsdaten.
 \end{abstract}
 
 \section{Einleitung und Aufgabenstellung}
 \label{sec:introduction}
-In diesem Projekt haben sich die Autoren mit Flexion, also dem morphologischen Prozess der Wortbildung durch Anpassung an die grammatische Funktion innerhalb des Satzes, befasst. Im Deutschen bezeichnet dies üblicherweise die Deklination von Substantiven und Adjektiven nach Kasus, Numerus und Genus sowie die Konjugation von Verben.
-Andere Sprachen unterliegen jedoch unterschiedlichen Flexionsparadigmen, und somit wurde von Anfang an darauf geachtet, ein möglichst sprach-unabhängiges System zu entwerfen das in der Lage ist, die tatsächlichen Strukturen einer Vielzahl von Beispielsprachen zu lernen und anwenden zu können.
+In diesem Projekt haben wir uns mit Flexion, also dem morphologischen Prozess der Wortbildung durch Anpassung an die grammatische Funktion innerhalb des Satzes, befasst. Im Deutschen bezeichnet dies üblicherweise die Deklination von Substantiven und Adjektiven nach Kasus, Numerus und Genus sowie die Konjugation von Verben.
+Andere Sprachen unterliegen jedoch unterschiedlichen Flexionsparadigmen, und somit wurde von Anfang an darauf geachtet, ein möglichst sprach-unabhängiges System zu entwerfen das in der Lage ist, die tatsächlichen Strukturen einer Vielzahl von Sprachen zu lernen und anwenden zu können.
 
 \subsection{SIGMORPHON Shared Task}
 \label{sec:sub:shared_task}
@@ -110,7 +110,7 @@ Wir haben es uns darüber hinaus als Ziel gesetzt, die Levenshtein-Distanz der A
 Ebenso wurde zusammen mit den Trainingsdaten ein Baseline-System ausgeliefert, das als Richtwert dient. Wir haben es uns zum Ziel genommen, in möglichst vielen Sprachen mit den Accuracy-Werten möglichst weit über den Ergebnissen dieses Baseline-Systems zu liegen.
 Dieses Baseline-System wird in \autoref{sec:baseline} näher erläutert.
 
-Letzten Endes wurden alle Systeme der Teilnehmer nach ihrer Accuracy miteinander verglichen, und wir haben uns dabei mit unserer Abgabe im soliden Mittelfeld positioniert. Insbesondere haben wir unsere Zielsetzung weitestgehend erreicht, und bis auf vereinzelte Ausreißer (die unter \autoref{sec:results} noch diskutiert werden) die Werte der Baseline überboten.
+Letzten Endes wurden alle Systeme der Teilnehmer nach ihrer Accuracy miteinander verglichen, und wir haben uns dabei mit unserer Abgabe im oberen Mittelfeld positioniert. Insbesondere haben wir unsere Zielsetzung weitestgehend erreicht, und bis auf vereinzelte Ausreißer (die unter \autoref{sec:results} noch diskutiert werden) die Werte der Baseline überboten.
 
 Aufgabe 2 wurde von uns nicht bearbeitet. Sie behandelt Flexion im Kontext: In einem gegebenen Satz müssen zunächst die Features bestimmt werden, nach welchen ein unflektiertes Wort flektiert wird, um dann im Anschluss die Komponente aus Aufgabe 1 anwenden zu können. In einer Variante erfolgt diese Vorhersage mit, in der anderen ohne gegebene Features der Nachbarwörter.
 
@@ -155,11 +155,11 @@ Im Deutschen kann man dieses Phänomen etwa am Flexionspaar \textit{das Haus} - 
 Der Umformungsprozess eines Eingabe-Lemmas in eine Ausgabeform wird in unserem System mittels eines deterministischen String-Transduktors realisiert. Dieser iteriert dabei mit einem Zeiger zeichenweise von links nach rechts über das Eingabewort und wendet eine von fünf Aktionen an, um die Ausgabe zu erzeugen. Zur Verfügung stehen die folgenden Aktionen:
 
 \begin{itemize}
-    \item \action{EMIT} $s$ (für ein beliebiges Symbol $s$): Hängt $s$ an den Ausgabe-String an, unabhängig davon, welches Zeichen der Zeiger gerade liest.
+    \item \action{EMIT} $s$: Hängt ein beliebiges Symbol $s$ an den Ausgabe-String an, unabhängig davon, welches Zeichen der Zeiger gerade liest.
     \item \action{COPY}: Hängt dasjenige Zeichen an die Ausgabe an, auf das der Zeiger im Lemma gerade zeigt.
     \item \action{PATCH $x$}: Wendet die Patch-Operation $x$ auf das Zeichen des Eingabe-Zeigers an, und hängt das resultierende Zeichen an den Ausgabe-String an.
     \item \action{MOVE}: Inkrementiert den Zeiger um 1 Zeichen, um weiter über das Eingabewort zu laufen.
-    \item \action{EOW} (\underline{e}nd \underline{o}f \underline{w}ord): Schließt den Transformationsprozess ab und kennzeichnet die aktuelle Ausgabe als finalen Rückgabewert.
+    \item \action{EOW} (\underline{e}nd \underline{o}f \underline{w}ord): Schließt den Transformationsprozess ab und kennzeichnet die aktuelle Ausgabe als finales Ergebnis.
 \end{itemize}
 
 Besonders hervorzuheben ist hierbei die \action{PATCH}-Aktion, die den zuvor genannten Wandel eines Zeichens im Wortstamm erfassen soll. Die ganze Struktur wird in \autoref{sec:patches} genauer erläutert.
@@ -208,14 +208,15 @@ Die Idee zur Verwendung dieser Patches kam uns als deutsche Muttersprachler bei 
 
 \subsection{Motivation}
 Die zuvor beschriebene Einteilung von Patches erscheint sinnvoll, da viele Wörter im Deutschen den Wortstamm - also eben den Teil des Wortes den unsere Architektur optimalerweise einfach mit \action{COPY}-Wiederholungen übernehmen soll - bei der Flexion verändern (siehe Tabelle X).
-Ein ähnliches Phänomen lässt sich auch in anderen Sprachen beobachten \citep{wiese:umlaut2009, kendris:cedilla2001}, weswegen wir den Entschluss gefasst haben das Konzept der \textit{Patches} fest in unser System zu verbauen. Obgleich wir nicht jede der über 100 bereitgestellten Sprachen beherrschen, steht so zumindest auf jedem Datensatz die Möglichkeit zur Verfügung, Patch-Aktionen durchzuführen. Im schlimmsten Fall, d.h. falls eine Sprache dieses Konzept überhaupt nicht nutzt, würden auch keine Patches gelernt und das System fällt auf einen einfachen Transduktionsprozess mit ausschließlich \action{COPY}, \action{MOVE} und \action{EMIT}-Aktionen zurück.\todo[inline]{M: Vielleicht noch erwähnen, dass wir Patches auch dann nicht nutzen, wenn die Sprache es zwar nutzt, aber keine Verbesserung der Ergebnisse stattfindet?}
+Ein ähnliches Phänomen lässt sich auch in anderen Sprachen beobachten \citep{kendris:cedilla2001, wiese:umlaut2009}, weswegen wir den Entschluss gefasst haben das Konzept der \textit{Patches} fest in unser System zu verbauen. Obgleich wir nicht jede der über 100 bereitgestellten Sprachen beherrschen, steht so zumindest auf jedem Datensatz die Möglichkeit zur Verfügung, Patch-Aktionen durchzuführen. Im schlimmsten Fall, d.h. falls eine Sprache dieses Konzept überhaupt nicht nutzt, würden auch keine Patches gelernt und das System fällt auf einen einfachen Transduktionsprozess mit ausschließlich \action{COPY}, \action{MOVE} und \action{EMIT}-Aktionen zurück.\todo[inline]{M: Vielleicht noch erwähnen, dass wir Patches auch dann nicht nutzen, wenn die Sprache es zwar nutzt, aber keine Verbesserung der Ergebnisse stattfindet?\\
+F: ist ja eher Hyperparam opt., würde ich hier nicht erwähnen}
 
 Eine weitere Inspiration war die zuvor bereits zitierte Arbeit von \citet{cjk-mt:LiuLLN17}, in der für ostasiatische Sprachen mit nicht-lateinischen Alphabeten die Auswirkung von Symbolfragmenten auf Pixelebene auf die Ergebnisse von Machine Translation untersucht wurde.
 Insbesondere der Code, den die Autoren online zur Verfügung gestellt haben, war uns eine große Hilfe für unsere eigene erste Implementation.
 
 \subsection{Erzeugung}
 Die Erzeugung der Patches geschieht grundsätzlich mit Hilfe von gerenderten 2D-Pixelmatrizen der jeweiligen Zeichen. Wir erzeugen für jedes Zeichen eine binäre Matrix konstanter Höhe und Breite, die pro Eintrag Informationen darüber enthält ob ein Pixel schwarz ist oder nicht.
-Die sich daraus ergebenden Matrizen werden dann paarweise mit \texttt{XOR}-Operationen über den einzelnen Elementen verglichen, woraus sich genau diejenigen Pixel ergeben, die zwischen den beiden Eingabematrizen unterschiedlich sind. Insbesondere nutzen wir aber nur diejenigen Ergebnisse, die auf Grundlage desselben ASCII-Zeichens errechnet wurden; ein Patch von \texttt{f} nach \texttt{d} ist zwar technisch möglich, umfasst aber statt einer Gruppe von ähnlichen Anwendungen nur diese eine Symbolsequenz und bringt damit keinen Mehrwert gegenüber einem einfachen \action{EMIT} \texttt{d}.
+Die sich daraus ergebenden Matrizen werden dann paarweise mit \texttt{XOR}-Operationen über den einzelnen Elementen verglichen, woraus sich genau diejenigen Pixel ergeben, die zwischen den beiden Eingabematrizen unterschiedlich sind. Insbesondere nutzen wir aber nur diejenigen Ergebnisse, die auf Grundlage desselben ASCII-Zeichens errechnet wurden; ein Patch von \texttt{f} nach \texttt{d} ist zwar technisch möglich, umfasst aber statt einer Gruppe von ähnlichen Anwendungen nur diese eine Symbolsequenz und bringt damit keinen Mehrwert gegenüber einem \action{EMIT} \texttt{d}.
 
 Eine Besonderheit stellt im lateinischen Alphabet der Buchstabe \texttt{i} dar, da der typische \enquote{i-Punkt} beim Patchen verschwindet und durch Akzentzeichen ersetzt wird. Im Gegensatz dazu wird bei allen anderen 25 Buchstaben des einfachen lateinischen Alphabets das Akzentzeichen \textit{hinzugefügt}, ohne die schon existierenden Pixel zu beeinflussen. Um dieses Verhalten auch für den Buchstaben \texttt{i} korrekt zu fassen, wird er in unserem System vor dem Rendern daher durch das Symbol \texttt{ı} aus den Turksprachen\todo[inline]{M: das Symbol ist nicht nur türkisch, sondern aus den Turksprachen: \url{https://de.wikipedia.org/wiki/\%C4\%B0}} ohne Punkt ersetzt, um ein vergleichbares Ergebnis zu erzeugen. Nichtsdestotrotz könnte dieser Effekt auch in uns unbekannten Sprachen mit nicht-lateinischen Alphabeten auftreten, daher erlaubt es die Architektur problemlos weitere Ersetzungsregeln einzufügen falls gewünscht.
 
