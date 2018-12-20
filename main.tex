@@ -386,7 +386,7 @@ Falls Aktionen den Index-Zeiger über die Länge des Lemmas hinaus schieben wür
   \label{fig:beam}
 \end{sidewaysfigure*}
 
-Um die Vorhersagegenauigkeit unseres Systems zu verbessern, haben wir Beam Search in den Decoding-Prozess eingebaut.
+Um die Vorhersagegenauigkeit unseres Systems zu verbessern haben wir Beam Search in den Decoding-Prozess eingebaut.
 Dies resultiert in mehreren Pfaden, von denen der Pfad mit der größten Wahrscheinlichkeit ausgewählt wird, um das final flektierte Ausgabewort zu erstellen.
 Die dazu benötigten Informationen werden in einem zusätzlichen Transduktor-Zustands-Objekt vorgehalten.
 Letzteres umfasst den internen Zustand des Decoders, die vorhergesagte Aktion mitsamt ihrer logarithmischen Wahrscheinlichkeit sowie den resultierenden Ausgabe-String für jeden Einzelschritt und Pfad im Decoding-Beam.
